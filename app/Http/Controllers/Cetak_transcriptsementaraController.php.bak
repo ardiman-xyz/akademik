@@ -1,0 +1,494 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\Registerst5s;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Input;
+use DB;
+use Redirect;
+use Alert;
+use PDF;
+use Auth;
+
+class Cetak_transcriptsementaraControllerbak extends Controller
+{
+  /**
+   * Display a listing of the resource.
+   *
+   * @return \Illuminate\Http\Response
+   */
+  public function index()
+  {
+    dd(1);
+    $nim_ = Input::get('nim');
+    $FacultyId = Auth::user()->Faculty_Id;
+
+    if($FacultyId==""){
+      $student = DB::table('acd_student')
+      ->where('Nim', $nim_)->first();
+    }else{
+      $student = DB::table('acd_student')
+      ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+      ->join('mstr_faculty','mstr_faculty.Faculty_Id','mstr_department.Faculty_Id')
+      ->where('mstr_faculty.Faculty_Id', $FacultyId)
+      ->where('Nim', $nim_)->first();
+    }
+
+    $departement=DB::table('acd_student')
+    ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+    ->leftjoin('mstr_faculty','mstr_faculty.Faculty_Id','=','mstr_department.Faculty_Id')
+    ->select('mstr_faculty.Faculty_Name')->where('Nim',$nim_)->first();
+
+    if($FacultyId==""){
+    $data = DB::table('acd_transcript')
+    ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+    ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+    ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+    ->where('acd_student.Nim',$nim_)
+    ->select('acd_student.*','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*',
+    DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue')
+    )
+    // ->select('acd_transcript.*')
+    ->get();
+  } else{
+    $data = DB::table('acd_transcript')
+    ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+    ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+    ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+    ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+    ->join('mstr_faculty','mstr_faculty.Faculty_Id','mstr_department.Faculty_Id')
+    ->where('mstr_faculty.Faculty_Id', $FacultyId)
+    ->where('acd_student.Nim',$nim_)
+    ->select('acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*',
+    DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'),
+    DB::raw('(SELECT Is_For_Transcript FROM acd_course_curriculum WHERE Department_Id = acd_student.Department_Id AND Class_Prog_Id = acd_student.Class_Prog_Id AND Course_Id = acd_transcript.Course_Id
+       AND Curriculum_Id = (SELECT Curriculum_Id FROM acd_curriculum_entry_year WHERE Term_Year_Id = acd_transcript.Term_Year_Id AND Department_Id = acd_student.Department_Id AND Class_Prog_Id = acd_student.Class_Prog_Id AND Course_Id = acd_transcript.Course_Id AND Entry_Year_Id = acd_student.Entry_Year_Id)) as Is_For_Transcript' )
+    )
+    ->get();
+  }
+
+  if($FacultyId==""){
+      $query=DB::table('acd_transcript')
+      ->select(DB::raw('SUM(acd_transcript.Sks) as jml_sks'),
+      DB::raw('round(sum(acd_transcript.Sks*acd_transcript.Weight_Value),2) as jml_mutu'),
+      DB::raw('round((sum(acd_transcript.Sks*acd_transcript.Weight_Value))/(SUM(acd_transcript.Sks)),2) as ipk'))
+      ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')->where('acd_student.Nim',$nim_)->first();
+  } else{
+    $query=DB::table('acd_transcript')
+    ->select(DB::raw('SUM(acd_transcript.Sks) as jml_sks'),
+    DB::raw('round(sum(acd_transcript.Sks*acd_transcript.Weight_Value),2) as jml_mutu'),
+    DB::raw('round((sum(acd_transcript.Sks*acd_transcript.Weight_Value))/(SUM(acd_transcript.Sks)),2) as ipk'))
+    ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+    ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+    ->join('mstr_faculty','mstr_faculty.Faculty_Id','mstr_department.Faculty_Id')
+    ->where('mstr_faculty.Faculty_Id', $FacultyId)
+    ->where('acd_student.Nim',$nim_)->first();
+  }
+    $jumlahdata=DB::table('acd_transcript')->select(
+    DB::raw('count(acd_transcript.Transcript_Id) as jmldata'))
+    ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+    ->where('acd_student.Nim',$nim_)->first();
+
+    $reason = DB::table('mstr_transcript_reason')->get();
+
+    return view('cetak/index_transcriptsementara')
+    ->with('jmldata', $jumlahdata)
+    ->with('student',$student)
+    ->with('reason',$reason)
+    ->with('query_', $query)
+    ->with('query',$data)
+    ->with('nim',$nim_);
+  }
+
+  /**
+   * Show the form for creating a new resource.
+   *
+   * @return \Illuminate\Http\Response
+   */
+  public function create()
+  {
+      //
+  }
+
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @return \Illuminate\Http\Response
+   */
+  public function store(Request $request)
+  {
+      //
+  }
+
+  /**
+   * Display the specified resource.
+   *
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function show($id)
+  {
+      //
+  }
+
+  /**
+   * Show the form for editing the specified resource.
+   *
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+
+   public function export(Request $request,$id)
+   {
+     $type = Input::get('type');
+
+     $nim = Input::get('nim');
+     $student=DB::table('acd_student')
+     ->where('Nim',$id)
+     ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+     ->join('mstr_education_program_type','mstr_department.Education_Prog_Type_Id','=','mstr_education_program_type.Education_Prog_Type_Id')
+     ->select('mstr_department.*','acd_student.*','mstr_education_program_type.Acronym','mstr_education_program_type.Program_Name')->first();
+     $faculty=DB::table('acd_student')
+     ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+     ->leftjoin('mstr_faculty','mstr_faculty.Faculty_Id','=','mstr_department.Faculty_Id')
+     ->select('mstr_faculty.Faculty_Name')->where('Nim',$id)->first();
+
+     $curiculum = DB::table('acd_curriculum_entry_year')
+     ->where('Department_Id',$student->Department_Id)
+     ->where('Class_Prog_Id',$student->Class_Prog_Id)
+     ->where('Entry_Year_Id',$student->Entry_Year_Id)
+     ->first();
+
+     $query=DB::table('acd_transcript')
+     ->join('acd_course_curriculum','acd_transcript.Course_Id','acd_course_curriculum.Course_Id')
+     ->select(DB::raw('SUM(acd_transcript.Sks) as jml_sks'),
+     DB::raw('round(sum(acd_transcript.Sks*acd_transcript.Weight_Value),2) as jml_mutu'),
+     DB::raw('round((sum(acd_transcript.Sks*acd_transcript.Weight_Value))/(SUM(acd_transcript.Sks)),2) as ipk'))
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->where('acd_student.Nim',$id)
+     ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+     ->first();
+
+     
+     $Datetimenow = Date('Y-m-d');
+     $active = DB::Table('mstr_term_year')->where('Start_Date','<=',$Datetimenow)->where('End_Date','>=',$Datetimenow)->select('Term_Year_Id')->first();
+
+
+     $data = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_course_curriculum.Curriculum_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*',
+      DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'))
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+     $data_d = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*',
+      DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'))
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->where('acd_grade_letter.Grade_Letter','D')
+      ->groupby('acd_course.Course_Id')
+     ->get();
+
+     $nilai_d = (count($data_d) / count($data))* 100/100;
+     $nilai_d = number_format($nilai_d,2);
+
+     $smt1 = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*')
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->where('acd_course_curriculum.Study_Level_Id',1)
+      ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+     $smt2 = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*')
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->where('acd_course_curriculum.Study_Level_Id',2)
+      ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+     $smt3 = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*')
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->where('acd_course_curriculum.Study_Level_Id',3)
+      ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+     $smt4 = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*')
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->where('acd_course_curriculum.Study_Level_Id',4)
+      ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+     $smt5 = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*')
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->where('acd_course_curriculum.Study_Level_Id',5)
+      ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+     $smt6 = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*')
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->where('acd_course_curriculum.Study_Level_Id',6)
+      ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+     $smt7 = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*')
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->where('acd_course_curriculum.Study_Level_Id',7)
+      ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+     $smt8 = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*')
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->where('acd_course_curriculum.Study_Level_Id',8)
+      ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+
+     $count = [];
+     $count['smt1'] = count($smt1);
+     $count['smt2'] = count($smt2);
+     $count['smt3'] = count($smt3);
+     $count['smt4'] = count($smt4);
+     $count['smt5'] = count($smt5);
+     $count['smt6'] = count($smt6);
+     $count['smt7'] = count($smt7);
+     $count['smt8'] = count($smt8);
+
+      $education_prog=DB::table('acd_transcript')
+      ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+      ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+      ->leftjoin('mstr_department','mstr_department.Department_Id','=','acd_course.Department_Id')
+      ->where('acd_student.Nim',$id)
+      ->groupBy('Education_Prog_Type_Id')
+      ->select('mstr_department.Education_Prog_Type_Id')
+     ->first();
+
+     $date = date('Y-m-d H:i:s');
+     $term_yearcount=DB::table('mstr_term_year')
+     ->where('Start_Date','<=',$date)
+     ->where('End_Date','>=',$date)
+     ->select('Start_Date','End_Date')
+     ->count();
+
+     if($term_yearcount == 0){
+       $term_year1 ="";
+     }else{
+       $term_year1=DB::table('mstr_term_year')
+       ->where('Start_Date','<=',$date)
+       ->where('End_Date','>=',$date)
+       ->select('Term_Year_Id')
+       ->first();
+       $term_year1=$term_year1->Term_Year_Id;
+     }
+
+     $namadekan="";
+     $ttd="";
+     switch ($education_prog->Education_Prog_Type_Id) {
+       case 2:
+         //$namadekan="Dekan Nya";
+         // $namadekan=DB::table('acd_functional_position_term_year')
+         // ->join('emp_employee','emp_employee.Functional_Position_Id','=','acd_functional_position_term_year.Functional_Position_Id')
+         // ->join('emp_functional_position','acd_functional_position_term_year.Functional_Position_Id','=','emp_functional_position.Functional_Position_Id')
+         // ->where('acd_functional_position_term_year.Faculty_Id',$education_prog->Faculty_Id)
+         // ->where('emp_functional_position.Functional_Position_Code','D')
+         // ->select('emp_employee.Full_Name')
+         $ttd="Kepala Program Studi";
+         try{
+           $countnamadekan = DB::table('emp_employee_structural')
+                ->join('emp_structural', 'emp_structural.Structural_Id','=','emp_employee_structural.Structural_Id')
+                ->join('emp_employee', 'emp_employee.Employee_Id','=','emp_employee_structural.Employee_Id')
+                ->leftjoin('mstr_work_unit','mstr_work_unit.Work_Unit_Id','=','emp_employee_structural.Work_Unit_Id')
+                ->where('emp_structural.Structural_Code','2')
+                ->count();
+           $namadekan=DB::table('emp_employee_structural')
+                ->join('emp_structural', 'emp_structural.Structural_Id','=','emp_employee_structural.Structural_Id')
+                ->join('emp_employee', 'emp_employee.Employee_Id','=','emp_employee_structural.Employee_Id')
+                ->leftjoin('mstr_work_unit','mstr_work_unit.Work_Unit_Id','=','emp_employee_structural.Work_Unit_Id')
+                ->where('emp_structural.Structural_Code','2')
+           ->first();
+
+           if($countnamadekan == 0){
+             $namadekan="";
+           } else {
+             $namadekan=$namadekan->First_Title.' '.$namadekan->Name.' '.$namadekan->Last_Title;
+           }
+         } catch(EXCEPTION $e){
+           $namadekan="";
+         }
+         break;
+
+         case 7:
+           $ttd="Ketua Program Studi";
+           try{
+             $countnamadekan=0;
+             if($countnamadekan == 0){
+               $namadekan="";
+             } else {
+               $namadekan="";
+              //  $namadekan=$namadekan->Full_Name;
+             }
+           } catch(EXCEPTION $e){
+             $namadekan="";
+           }
+           break;
+
+       default:
+       $ttd="Dekan";
+       try{
+         $countnamadekan=0;
+         if($countnamadekan == 0){
+           $namadekan="";
+         } else {
+           $namadekan='';
+          //  $namadekan=$namadekan->Full_Name;
+         }
+       } catch(EXCEPTION $e){
+         $namadekan="";
+       }
+       break;
+     }
+
+     $dosen = DB::table('emp_employee')->join('acd_offered_course_lecturer', 'acd_offered_course_lecturer.Employee_Id' , '=', 'emp_employee.Employee_Id')
+     ->join('acd_offered_course', 'acd_offered_course.Offered_Course_id', '=', 'acd_offered_course_lecturer.Offered_Course_id')
+     ->where('acd_offered_course.Offered_Course_id', $id)
+     ->orderBy('acd_offered_course_lecturer.Order_Id' , 'asc')
+     ->get();
+
+     
+    //  dd($active);
+    if($active != null){
+      $atv = $active->Term_Year_Id;
+    }else{
+      $atv = 20191;
+    }
+     $dosens = DB::table('acd_functional_position_term_year')
+         ->join('emp_functional_position', 'emp_functional_position.Functional_Position_Id','=','acd_functional_position_term_year.Functional_Position_Id')
+         ->join('emp_employee', 'emp_employee.Employee_Id','=','acd_functional_position_term_year.Employee_Id')
+         ->leftjoin('mstr_faculty','mstr_faculty.Faculty_Id','=','acd_functional_position_term_year.Faculty_Id')
+         ->leftjoin('mstr_department','mstr_department.Department_Id','=','acd_functional_position_term_year.Department_Id')
+        //  ->where('acd_functional_position_term_year.Term_Year_Id', 20191)
+         ->where('acd_functional_position_term_year.Term_Year_Id', $atv)
+         ->orderBy('mstr_faculty.Faculty_Name', 'asc')
+         ->orderBy('mstr_department.Department_Name', 'asc')
+         ->orderBy('acd_functional_position_term_year.Functional_Position_Id', 'asc')
+         ->get();
+
+    // $keperluans = $reason = DB::table('mstr_transcript_reason')->where('Transcript_Reason_Id',$request->keperluan)->first();
+    $keperluan = $request->keperluan;
+
+    $complete_skss = DB::table('mstr_curriculum_applied')
+    ->where('Department_Id',$student->Department_Id)
+    ->where('Class_Prog_Id',$student->Class_Prog_Id)
+    ->where('Curriculum_Id',$curiculum->Curriculum_Id)
+    ->select('Sks_Completion')
+    ->first();
+    if($complete_skss != null){
+      $complete_sks = $complete_skss->Sks_Completion;
+    }else{
+      $complete_sks = 0;
+    }
+    $u =  DB::table('acd_temporary_transcript_reason')
+              ->insert([
+                'Student_Id' => $student->Student_Id,
+                'Transcript_Reason_Id' => 1,
+                'Description' => $request->keperluan,
+                'Created_Date'=>Date('Y-m-d'),
+                'Created_By'=>Auth::user()->email]);
+
+     View()->share(['complete_sks'=>$complete_sks,'keperluan'=>$keperluan,'nilai_d'=>$nilai_d,'count'=>$count,'faculty'=>$faculty,'ttd'=>$ttd,'dekan'=>$namadekan,'dosen'=>$dosen,'dosens'=>$dosens,'query_'=>$query,'data'=> $data,'nim'=>$nim,'student'=>$student]);
+     if ($type == "transkripsementara") {
+       $pdf = PDF::loadView('cetak/export_transcriptsementara');
+       return $pdf->stream('Transkrip_sementara.pdf');
+     }
+     // return view('acd_course/index')->with('department', $department)->with('query',$data)->with('search',$search);
+
+   }
+
+
+  public function edit($id)
+  {
+      //
+  }
+
+  /**
+   * Update the specified resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function update(Request $request, $id)
+  {
+      //
+  }
+
+  /**
+   * Remove the specified resource from storage.
+   *
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function destroy($id)
+  {
+      //
+  }
+}

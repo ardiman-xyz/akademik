@@ -1,0 +1,767 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\Registerst5s;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Input;
+use DB;
+use Redirect;
+use Alert;
+use PDF;
+use Auth;
+
+class Cetak_transcriptsementaraControllerbaknew extends Controller
+{
+  /**
+   * Display a listing of the resource.
+   *
+   * @return \Illuminate\Http\Response
+   */
+  public function index()
+  {
+    $nim_ = Input::get('nim');
+    $FacultyId = Auth::user()->Faculty_Id;
+    $DepartmentId = Auth::user()->Department_Id;
+
+    // if($FacultyId==""){
+    //   $student = DB::table('acd_student')
+    //   ->where('Nim', $nim_)->first();
+    // }else{
+      $student = DB::table('acd_student')
+      ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+      ->join('mstr_faculty','mstr_faculty.Faculty_Id','mstr_department.Faculty_Id')
+      // ->where('mstr_faculty.Faculty_Id','like', '%'.$FacultyId.'%')
+      // ->where('acd_student.Department_Id','like', '%'.$DepartmentId.'%')
+      ->where('Nim', $nim_)->first();
+    // }
+
+    $departement=DB::table('acd_student')
+    ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+    ->leftjoin('mstr_faculty','mstr_faculty.Faculty_Id','=','mstr_department.Faculty_Id')
+    ->select('mstr_faculty.Faculty_Name')->where('Nim',$nim_)->first();
+
+    // if($FacultyId==""){
+    $datas = DB::table('acd_transcript')
+    ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+    ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+    ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+    ->where('acd_student.Nim',$nim_)
+    // ->where('acd_student.Department_Id','like', '%'.$DepartmentId.'%')
+    ->select('acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*',
+    DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'))
+    // ->select('acd_transcript.*')
+    ->orderby('acd_course.Course_Code')
+    ->get();
+    $p = 0;
+    $data = [];
+    // dd($datas);
+    foreach ($datas as $key){
+      if($key->Khs_Id != null){
+        $krs = DB::table('acd_student_khs')->where('Khs_Id',$key->Khs_Id)->first();
+        $component = DB::table('acd_student_khs_nilai_component')->where('Krs_Id',$krs->Krs_Id)->first();
+        // dd($component);
+        if($component == null){
+          $data[$p]['Full_Name'] = $key->Full_Name;
+          $data[$p]['Transcript_Id'] = $key->Transcript_Id;
+          $data[$p]['Student_Id'] = $key->Student_Id;
+          $data[$p]['Course_Id'] = $key->Course_Id;
+          $data[$p]['Term_Year_Id'] = $key->Term_Year_Id;
+          $data[$p]['Khs_Id'] = $key->Khs_Id;
+          $data[$p]['Exam_Result_For'] = $key->Exam_Result_For;
+          $data[$p]['Sks'] = $key->Sks;
+          $data[$p]['Is_Transfer'] = $key->Is_Transfer;
+          $data[$p]['Course_Code_Transfer'] = $key->Course_Code_Transfer;
+          $data[$p]['Course_Name_Transfer'] = $key->Course_Name_Transfer;
+          $data[$p]['Sks_Transfer'] = $key->Sks_Transfer;
+          $data[$p]['Grade_Letter_Id'] = $key->Grade_Letter_Id;
+          $data[$p]['Grade_Letter_Transfer'] = $key->Grade_Letter_Transfer;
+          $data[$p]['Weight_Value'] = $key->Weight_Value;
+          $data[$p]['is_Use'] = $key->is_Use;
+          $data[$p]['Description'] = $key->Description;
+          $data[$p]['Is_Required'] = $key->Is_Required;
+          $data[$p]['Bnk_Value'] = $key->Bnk_Value;
+          $data[$p]['Created_Date'] = $key->Created_Date;
+          $data[$p]['Created_By'] = $key->Created_By;
+          $data[$p]['Modified_By'] = $key->Modified_By;
+          $data[$p]['Modified_Date'] = $key->Modified_Date;
+          $data[$p]['Order_Id'] = $key->Order_Id;
+          $data[$p]['Grade_Letter'] = $key->Grade_Letter;
+          $data[$p]['Department_Id'] = $key->Department_Id;
+          $data[$p]['Course_Type_Id'] = $key->Course_Type_Id;
+          $data[$p]['Course_Code'] = $key->Course_Code;
+          $data[$p]['Course_Name'] = $key->Course_Name;
+          $data[$p]['Course_Name_Eng'] = $key->Course_Name_Eng;
+          $data[$p]['Feeder_Id'] = $key->Feeder_Id;
+          $data[$p]['weightvalue'] = $key->weightvalue;
+        }else{
+          // if($component->UAS_Score != null){
+            $data[$p]['Full_Name'] = $key->Full_Name;
+            $data[$p]['Transcript_Id'] = $key->Transcript_Id;
+            $data[$p]['Student_Id'] = $key->Student_Id;
+            $data[$p]['Course_Id'] = $key->Course_Id;
+            $data[$p]['Term_Year_Id'] = $key->Term_Year_Id;
+            $data[$p]['Khs_Id'] = $key->Khs_Id;
+            $data[$p]['Exam_Result_For'] = $key->Exam_Result_For;
+            $data[$p]['Sks'] = $key->Sks;
+            $data[$p]['Is_Transfer'] = $key->Is_Transfer;
+            $data[$p]['Course_Code_Transfer'] = $key->Course_Code_Transfer;
+            $data[$p]['Course_Name_Transfer'] = $key->Course_Name_Transfer;
+            $data[$p]['Sks_Transfer'] = $key->Sks_Transfer;
+            $data[$p]['Grade_Letter_Id'] = $key->Grade_Letter_Id;
+            $data[$p]['Grade_Letter_Transfer'] = $key->Grade_Letter_Transfer;
+            $data[$p]['Weight_Value'] = $key->Weight_Value;
+            $data[$p]['is_Use'] = $key->is_Use;
+            $data[$p]['Description'] = $key->Description;
+            $data[$p]['Is_Required'] = $key->Is_Required;
+            $data[$p]['Bnk_Value'] = $key->Bnk_Value;
+            $data[$p]['Created_Date'] = $key->Created_Date;
+            $data[$p]['Created_By'] = $key->Created_By;
+            $data[$p]['Modified_By'] = $key->Modified_By;
+            $data[$p]['Modified_Date'] = $key->Modified_Date;
+            $data[$p]['Order_Id'] = $key->Order_Id;
+            $data[$p]['Grade_Letter'] = $key->Grade_Letter;
+            $data[$p]['Department_Id'] = $key->Department_Id;
+            $data[$p]['Course_Type_Id'] = $key->Course_Type_Id;
+            $data[$p]['Course_Code'] = $key->Course_Code;
+            $data[$p]['Course_Name'] = $key->Course_Name;
+            $data[$p]['Course_Name_Eng'] = $key->Course_Name_Eng;
+            $data[$p]['Feeder_Id'] = $key->Feeder_Id;
+            $data[$p]['weightvalue'] = $key->weightvalue;
+          // }
+        }
+  
+        $p++;
+      }else{
+        $data[$p]['Full_Name'] = $key->Full_Name;
+        $data[$p]['Transcript_Id'] = $key->Transcript_Id;
+        $data[$p]['Student_Id'] = $key->Student_Id;
+        $data[$p]['Course_Id'] = $key->Course_Id;
+        $data[$p]['Term_Year_Id'] = $key->Term_Year_Id;
+        $data[$p]['Khs_Id'] = $key->Khs_Id;
+        $data[$p]['Exam_Result_For'] = $key->Exam_Result_For;
+        $data[$p]['Sks'] = $key->Sks;
+        $data[$p]['Is_Transfer'] = $key->Is_Transfer;
+        $data[$p]['Course_Code_Transfer'] = $key->Course_Code_Transfer;
+        $data[$p]['Course_Name_Transfer'] = $key->Course_Name_Transfer;
+        $data[$p]['Sks_Transfer'] = $key->Sks_Transfer;
+        $data[$p]['Grade_Letter_Id'] = $key->Grade_Letter_Id;
+        $data[$p]['Grade_Letter_Transfer'] = $key->Grade_Letter_Transfer;
+        $data[$p]['Weight_Value'] = $key->Weight_Value;
+        $data[$p]['is_Use'] = $key->is_Use;
+        $data[$p]['Description'] = $key->Description;
+        $data[$p]['Is_Required'] = $key->Is_Required;
+        $data[$p]['Bnk_Value'] = $key->Bnk_Value;
+        $data[$p]['Created_Date'] = $key->Created_Date;
+        $data[$p]['Created_By'] = $key->Created_By;
+        $data[$p]['Modified_By'] = $key->Modified_By;
+        $data[$p]['Modified_Date'] = $key->Modified_Date;
+        $data[$p]['Order_Id'] = $key->Order_Id;
+        $data[$p]['Grade_Letter'] = $key->Grade_Letter;
+        $data[$p]['Department_Id'] = $key->Department_Id;
+        $data[$p]['Course_Type_Id'] = $key->Course_Type_Id;
+        $data[$p]['Course_Code'] = $key->Course_Code;
+        $data[$p]['Course_Name'] = $key->Course_Name;
+        $data[$p]['Course_Name_Eng'] = $key->Course_Name_Eng;
+        $data[$p]['Feeder_Id'] = $key->Feeder_Id;
+        $data[$p]['weightvalue'] = $key->weightvalue;
+
+        $p++;
+      }
+    }
+  // } else{
+  //   $data = DB::table('acd_transcript')
+  //   ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+  //   ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+  //   ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+  //   ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+  //   ->join('mstr_faculty','mstr_faculty.Faculty_Id','mstr_department.Faculty_Id')
+  //   ->where('mstr_faculty.Faculty_Id', $FacultyId)
+  //   ->where('acd_student.Nim',$nim_)
+  //   ->select('acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*',
+  //   DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'))
+  //   ->get();
+  // }
+
+  // if($FacultyId==""){
+      $querys=DB::table('acd_transcript')
+      ->select('acd_transcript.Sks','acd_transcript.Weight_Value','acd_transcript.Khs_Id')
+      ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+      ->where('acd_student.Nim',$nim_)
+      // ->where('acd_student.Department_Id','like', '%'.$DepartmentId.'%')
+      ->get();
+      // dd($DepartmentId);
+      // 6112200001
+      $query['jml_sks'] = 0;
+      $query['jml_mutu'] = 0;
+      $query['ipk'] = 0;
+      $r = 0;
+      foreach ($querys as $key) {
+        // if($key->Khs_Id != null){
+        //   $krs = DB::table('acd_student_khs')->where('Khs_Id',$key->Khs_Id)->first();
+        //   $component = DB::table('acd_student_khs_nilai_component')->where('Krs_Id',$krs->Krs_Id)->first();
+        //   if($component == null){
+        //     $query['jml_sks'] = $query['jml_sks'] + $key->Sks;
+        //     $query['jml_mutu'] = $query['jml_mutu'] + ($key->Sks * $key->Weight_Value );
+        //     $query['ipk'] = $query['jml_mutu']/$query['jml_sks'];
+        //   }else{
+        //     if($component->UAS_Score != null){
+        //       $query['jml_sks'] = $query['jml_sks'] + $key->Sks;
+        //       $query['jml_mutu'] = $query['jml_mutu'] + ($key->Sks * $key->Weight_Value );
+        //       $query['ipk'] = $query['jml_mutu']/$query['jml_sks'];
+        //     }
+        //   }
+        // }else{
+          $query['jml_sks'] = $query['jml_sks'] + $key->Sks;
+          $query['jml_mutu'] = $query['jml_mutu'] + ($key->Sks * $key->Weight_Value );
+          $query['ipk'] = $query['jml_mutu']/$query['jml_sks'];
+        // }
+      }
+      $query['ipk'] = number_format($query['ipk'],2);
+
+      // dd($query);
+
+  // } else{
+  //   $query=DB::table('acd_transcript')
+  //   ->select(DB::raw('SUM(acd_transcript.Sks) as jml_sks'),
+  //   DB::raw('round(sum(acd_transcript.Sks*acd_transcript.Weight_Value),2) as jml_mutu'),
+  //   DB::raw('round((sum(acd_transcript.Sks*acd_transcript.Weight_Value))/(SUM(acd_transcript.Sks)),2) as ipk'))
+  //   ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+  //   ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+  //   ->join('mstr_faculty','mstr_faculty.Faculty_Id','mstr_department.Faculty_Id')
+  //   ->where('mstr_faculty.Faculty_Id', $FacultyId)
+  //   ->where('acd_student.Nim',$nim_)->first();
+  // }
+    $jumlahdata=DB::table('acd_transcript')->select(
+    DB::raw('count(acd_transcript.Transcript_Id) as jmldata'))
+    ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+    ->where('acd_student.Nim',$nim_)->first();
+
+    $reason = DB::table('mstr_transcript_reason')->get();
+
+    return view('cetak/index_transcriptsementara')
+    ->with('jmldata', $jumlahdata)
+    ->with('student',$student)
+    ->with('reason',$reason)
+    ->with('query_', $query)
+    ->with('query',$data)
+    ->with('nim',$nim_);
+  }
+
+  public function index2()
+  {
+    $nim_ = Input::get('nim');
+    $FacultyId = Auth::user()->Faculty_Id;
+    $DepartmentId = Auth::user()->Department_Id;
+
+    // if($FacultyId==""){
+    //   $student = DB::table('acd_student')
+    //   ->where('Nim', $nim_)->first();
+    // }else{
+    $student = DB::table('acd_student')
+    ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+    ->join('mstr_faculty','mstr_faculty.Faculty_Id','mstr_department.Faculty_Id')
+    // ->where('mstr_faculty.Faculty_Id','like', '%'.$FacultyId.'%')
+    // ->where('acd_student.Department_Id','like', '%'.$DepartmentId.'%')
+    ->where('Nim', $nim_)->first();
+    // }
+
+    $departement=DB::table('acd_student')
+    ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+    ->leftjoin('mstr_faculty','mstr_faculty.Faculty_Id','=','mstr_department.Faculty_Id')
+    ->select('mstr_faculty.Faculty_Name')->where('Nim',$nim_)->first();
+
+    $datas = DB::table('acd_transcript')
+    ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+    ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+    ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+    ->join('acd_course_curriculum' ,function ($join)
+      {
+        $join
+        ->on('acd_student.Class_Prog_Id','=','acd_course_curriculum.Class_Prog_Id')
+        ->on('acd_transcript.Course_Id','=','acd_course_curriculum.Course_Id')
+        ->on('acd_student.Department_Id','=','acd_course_curriculum.Department_Id');
+      })
+    ->where('acd_student.Nim',$nim_)
+    ->select('acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*','acd_course_curriculum.Study_Level_Id',
+      DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'))
+    ->orderby('acd_course.Course_Code')
+    ->groupby('acd_transcript.Student_Id','acd_transcript.Course_Id')
+    ->get();
+    // dd($datas);
+
+    $p = 0;
+    $smt = [];
+    foreach ($datas as $key) {
+      if($key->Khs_Id != null){
+        $krs = DB::table('acd_student_khs')->where('Khs_Id',$key->Khs_Id)->first();
+        $component = DB::table('acd_student_khs_nilai_component')->where('Krs_Id',$krs->Krs_Id)->first();
+        if($component == null){
+          $smt[$p]['Transcript_Id'] = $key->Transcript_Id;
+          $smt[$p]['Sks'] = $key->Sks;
+          $smt[$p]['Is_Transfer'] = $key->Is_Transfer;
+          $smt[$p]['Weight_Value'] = $key->Weight_Value;
+          $smt[$p]['is_Use'] = $key->is_Use;
+          $smt[$p]['Is_Required'] = $key->Is_Required;
+          $smt[$p]['Bnk_Value'] = $key->Bnk_Value;
+          $smt[$p]['Grade_Letter'] = $key->Grade_Letter;
+          $smt[$p]['Course_Code'] = $key->Course_Code;
+          $smt[$p]['Course_Name'] = $key->Course_Name;
+          $smt[$p]['Course_Name_Eng'] = $key->Course_Name_Eng;
+          $smt[$p]['weightvalue'] = $key->weightvalue;
+          $smt[$p]['Study_Level_Id'] = $key->Study_Level_Id;
+        }else{
+          // if($component->UAS_Score != null){
+            $smt[$p]['Transcript_Id'] = $key->Transcript_Id;
+            $smt[$p]['Sks'] = $key->Sks;
+            $smt[$p]['Is_Transfer'] = $key->Is_Transfer;
+            $smt[$p]['Weight_Value'] = $key->Weight_Value;
+            $smt[$p]['is_Use'] = $key->is_Use;
+            $smt[$p]['Is_Required'] = $key->Is_Required;
+            $smt[$p]['Bnk_Value'] = $key->Bnk_Value;
+            $smt[$p]['Grade_Letter'] = $key->Grade_Letter;
+            $smt[$p]['Course_Code'] = $key->Course_Code;
+            $smt[$p]['Course_Name'] = $key->Course_Name;
+            $smt[$p]['Course_Name_Eng'] = $key->Course_Name_Eng;
+            $smt[$p]['weightvalue'] = $key->weightvalue;
+            $smt[$p]['Study_Level_Id'] = $key->Study_Level_Id;
+          // }
+        }
+      }else{
+        $smt[$p]['Transcript_Id'] = $key->Transcript_Id;
+        $smt[$p]['Sks'] = $key->Sks;
+        $smt[$p]['Is_Transfer'] = $key->Is_Transfer;
+        $smt[$p]['Weight_Value'] = $key->Weight_Value;
+        $smt[$p]['is_Use'] = $key->is_Use;
+        $smt[$p]['Is_Required'] = $key->Is_Required;
+        $smt[$p]['Bnk_Value'] = $key->Bnk_Value;
+        $smt[$p]['Grade_Letter'] = $key->Grade_Letter;
+        $smt[$p]['Course_Code'] = $key->Course_Code;
+        $smt[$p]['Course_Name'] = $key->Course_Name;
+        $smt[$p]['Course_Name_Eng'] = $key->Course_Name_Eng;
+        $smt[$p]['weightvalue'] = $key->weightvalue;
+        $smt[$p]['Study_Level_Id'] = $key->Study_Level_Id;
+      }
+
+      $p++;
+    }
+
+    // dd($smt);
+    $nilai_d = 0;
+    foreach ($smt as $key)if($key['Grade_Letter'] == 'D' && $key['is_Use'] == true){
+      $nilai_d = $nilai_d+$key['Sks'];
+    }
+
+    $querys=DB::table('acd_transcript')
+      ->select('acd_transcript.Sks','acd_transcript.Weight_Value','acd_transcript.Khs_Id')
+      ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+      ->where('acd_student.Nim',$nim_)
+    ->where('acd_transcript.is_Use',true)
+      ->get();
+    // 6112200001
+    $query['jml_sks'] = 0;
+    $query['jml_mutu'] = 0;
+    $query['ipk'] = 0;
+    $r = 0;
+    foreach ($querys as $key) {
+        $query['jml_sks'] = $query['jml_sks'] + $key->Sks;
+        $query['jml_mutu'] = $query['jml_mutu'] + ($key->Sks * $key->Weight_Value );
+        $query['ipk'] = $query['jml_mutu']/$query['jml_sks'];
+    }
+    $query['ipk'] = number_format($query['ipk'],2);
+
+    $complete_sks = 0;
+    if($student){
+      $curiculum = DB::table('acd_curriculum_entry_year')
+       ->where('Department_Id',$student->Department_Id)
+       ->where('Class_Prog_Id',$student->Class_Prog_Id)
+       ->where('Entry_Year_Id',$student->Entry_Year_Id)
+       ->first();
+       if($curiculum){
+         $complete_skss = DB::table('mstr_curriculum_applied')
+         ->where('Department_Id',$student->Department_Id)
+         ->where('Class_Prog_Id',$student->Class_Prog_Id)
+         ->where('Curriculum_Id',$curiculum->Curriculum_Id)
+         ->select('Sks_Completion')
+         ->first();
+         if($complete_skss != null){
+           $complete_sks = $complete_skss->Sks_Completion;
+         }else{
+           $complete_sks = 0;
+         }
+       }else{
+        $complete_sks = 0;
+       }
+    }
+
+    return view('cetak/index_transcriptsementara2')
+    ->with('jmldata', count($smt))
+    ->with('student',$student)
+    ->with('smt',$smt)
+    ->with('query_',$query)
+    ->with('nilai_d',$nilai_d)
+    ->with('complete_sks',$complete_sks)
+    ->with('nim',$nim_);
+  }
+
+  public function use_transcript(Request $request){
+    // dd($request->Transcript_Id);
+    $student = DB::table('acd_student')->where('Nim',$request->Nim)->select('Student_Id')->first();
+    $datas = DB::table('acd_transcript')->where('Student_Id',$student->Student_Id)->get();
+    foreach ($datas as $data) {
+      if(in_array($data->Transcript_Id,$request->Transcript_Id)){
+        $update = DB::table('acd_transcript')->where('Transcript_Id',$data->Transcript_Id)->update(['is_Use'=>true]);
+      }else{
+        $update = DB::table('acd_transcript')->where('Transcript_Id',$data->Transcript_Id)->update(['is_Use'=>false]);
+      }
+    }
+    return response()->json(['success'=>true,'message'=>'Success Update Data']);
+  }
+
+  /**
+   * Show the form for creating a new resource.
+   *
+   * @return \Illuminate\Http\Response
+   */
+  public function create()
+  {
+      //
+  }
+
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @return \Illuminate\Http\Response
+   */
+  public function store(Request $request)
+  {
+      //
+  }
+
+  /**
+   * Display the specified resource.
+   *
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function show($id)
+  {
+      //
+  }
+
+  /**
+   * Show the form for editing the specified resource.
+   *
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+
+   public function export(Request $request,$id)
+   {
+     $type = Input::get('type');
+
+     $nim = Input::get('nim');
+     $student=DB::table('acd_student')
+     ->where('Nim',$id)
+     ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+     ->join('mstr_education_program_type','mstr_department.Education_Prog_Type_Id','=','mstr_education_program_type.Education_Prog_Type_Id')
+     ->select('mstr_department.*','acd_student.*','mstr_education_program_type.Acronym','mstr_education_program_type.Program_Name')->first();
+     $faculty=DB::table('acd_student')
+     ->join('mstr_department','mstr_department.Department_Id','=','acd_student.Department_Id')
+     ->leftjoin('mstr_faculty','mstr_faculty.Faculty_Id','=','mstr_department.Faculty_Id')
+     ->select('mstr_faculty.Faculty_Name')->where('Nim',$id)->first();
+
+     $querys=DB::table('acd_transcript')
+      ->select('acd_transcript.Sks','acd_transcript.Weight_Value','acd_transcript.Khs_Id')
+      ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+      ->where('acd_student.Nim',$id)
+      ->where('acd_transcript.is_Use',true)
+      ->get();
+      // 6112200001
+      $query['jml_sks'] = 0;
+      $query['jml_mutu'] = 0;
+      $query['ipk'] = 0;
+      $r = 0;
+      foreach ($querys as $key) {
+        // if($key->Khs_Id != null){
+        //   $krs = DB::table('acd_student_khs')->where('Khs_Id',$key->Khs_Id)->first();
+        //   $component = DB::table('acd_student_khs_nilai_component')->where('Krs_Id',$krs->Krs_Id)->first();
+        //   if($component == null){
+        //     $query['jml_sks'] = $query['jml_sks'] + $key->Sks;
+        //     $query['jml_mutu'] = $query['jml_mutu'] + ($key->Sks * $key->Weight_Value );
+        //     $query['ipk'] = $query['jml_mutu']/$query['jml_sks'];
+        //   }else{
+        //     if($component->UAS_Score != null){
+        //       $query['jml_sks'] = $query['jml_sks'] + $key->Sks;
+        //       $query['jml_mutu'] = $query['jml_mutu'] + ($key->Sks * $key->Weight_Value );
+        //       $query['ipk'] = $query['jml_mutu']/$query['jml_sks'];
+        //     }
+        //   }
+        // }else{
+          $query['jml_sks'] = $query['jml_sks'] + $key->Sks;
+          $query['jml_mutu'] = $query['jml_mutu'] + ($key->Sks * $key->Weight_Value );
+          $query['ipk'] = $query['jml_mutu']/$query['jml_sks'];
+        // }
+      }
+      $query['ipk'] = number_format($query['ipk'],2);
+
+     
+     $Datetimenow = Date('Y-m-d');
+     $active = DB::Table('mstr_term_year')->where('Start_Date','<=',$Datetimenow)->where('End_Date','>=',$Datetimenow)->select('Term_Year_Id')->first();
+
+     $curiculum = DB::table('acd_curriculum_entry_year')
+     ->where('Department_Id',$student->Department_Id)
+     ->where('Class_Prog_Id',$student->Class_Prog_Id)
+     ->where('Entry_Year_Id',$student->Entry_Year_Id)
+     ->first();
+
+     $data = DB::table('acd_transcript')
+     ->select('acd_course_curriculum.Study_Level_Id','acd_course_curriculum.Curriculum_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*',
+      DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'))
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_course_curriculum','acd_course.Course_Id','acd_course_curriculum.Course_Id')
+      ->where('acd_student.Nim',$id)
+    ->where('acd_transcript.is_Use',true)
+      // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+      ->groupby('acd_course.Course_Id')
+     ->get();
+     $data_d = DB::table('acd_transcript')
+    //  ->select('acd_course_curriculum.Study_Level_Id','acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*',
+    //   DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'))
+     ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+     ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+     ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+     ->join('acd_student_khs','acd_transcript.Khs_Id','acd_student_khs.Khs_Id')
+     ->where('acd_student.Nim',$id)
+    ->where('acd_transcript.is_Use',true)
+     // ->where('acd_course_curriculum.Curriculum_Id',$curiculum->Curriculum_Id)
+     ->where('acd_grade_letter.Grade_Letter','D')
+     ->groupby('acd_course.Course_Id')
+     ->get();
+
+     if(count($data_d) > 0){
+       $nilai_d = (count($data_d) / count($data))* 100;
+       $nilai_d = number_format($nilai_d,2);
+     }else{
+      $nilai_d = 0;
+     }
+
+     $datas = DB::table('acd_transcript')
+    ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+    ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+    ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+    ->join('acd_course_curriculum' ,function ($join)
+      {
+        $join
+        ->on('acd_student.Class_Prog_Id','=','acd_course_curriculum.Class_Prog_Id')
+        ->on('acd_transcript.Course_Id','=','acd_course_curriculum.Course_Id')
+        ->on('acd_student.Department_Id','=','acd_course_curriculum.Department_Id');
+      })
+    ->where('acd_student.Nim',$id)
+    ->where('acd_transcript.is_Use',true)
+    ->select('acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*','acd_course_curriculum.Study_Level_Id',
+      DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'))
+    ->orderby('acd_course.Course_Code')
+    ->groupby('acd_transcript.Student_Id','acd_transcript.Course_Id')
+    ->get();
+
+    // $datas = DB::table('acd_transcript')
+    // ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+    // ->join('acd_grade_letter','acd_grade_letter.Grade_Letter_Id','=','acd_transcript.Grade_Letter_Id')
+    // ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+    // ->where('acd_student.Nim',$id)
+    // // ->where('acd_student.Department_Id','like', '%'.$DepartmentId.'%')
+    // ->select('acd_student.Full_Name','acd_transcript.*','acd_grade_letter.Grade_Letter','acd_course.*',
+    // DB::raw('round((acd_transcript.Sks*acd_transcript.Weight_Value),2) as weightvalue'))
+    // // ->select('acd_transcript.*')
+    // ->orderby('acd_course.Course_Code')
+    // ->get();
+    // dd($datas);
+     $p = 0;
+    $smt = [];
+    foreach ($datas as $key) {
+      if($key->Khs_Id != null){
+        $krs = DB::table('acd_student_khs')->where('Khs_Id',$key->Khs_Id)->first();
+        $component = DB::table('acd_student_khs_nilai_component')->where('Krs_Id',$krs->Krs_Id)->first();
+        if($component == null){
+          $smt[$p]['Sks'] = $key->Sks;
+          $smt[$p]['Is_Transfer'] = $key->Is_Transfer;
+          $smt[$p]['Weight_Value'] = $key->Weight_Value;
+          $smt[$p]['is_Use'] = $key->is_Use;
+          $smt[$p]['Is_Required'] = $key->Is_Required;
+          $smt[$p]['Bnk_Value'] = $key->Bnk_Value;
+          $smt[$p]['Grade_Letter'] = $key->Grade_Letter;
+          $smt[$p]['Course_Code'] = $key->Course_Code;
+          $smt[$p]['Course_Name'] = $key->Course_Name;
+          $smt[$p]['Course_Name_Eng'] = $key->Course_Name_Eng;
+          $smt[$p]['weightvalue'] = $key->weightvalue;
+          $smt[$p]['Study_Level_Id'] = $key->Study_Level_Id;
+        }else{
+          // if($component->UAS_Score != null){
+            $smt[$p]['Sks'] = $key->Sks;
+            $smt[$p]['Is_Transfer'] = $key->Is_Transfer;
+            $smt[$p]['Weight_Value'] = $key->Weight_Value;
+            $smt[$p]['is_Use'] = $key->is_Use;
+            $smt[$p]['Is_Required'] = $key->Is_Required;
+            $smt[$p]['Bnk_Value'] = $key->Bnk_Value;
+            $smt[$p]['Grade_Letter'] = $key->Grade_Letter;
+            $smt[$p]['Course_Code'] = $key->Course_Code;
+            $smt[$p]['Course_Name'] = $key->Course_Name;
+            $smt[$p]['Course_Name_Eng'] = $key->Course_Name_Eng;
+            $smt[$p]['weightvalue'] = $key->weightvalue;
+            $smt[$p]['Study_Level_Id'] = $key->Study_Level_Id;
+          // }
+        }
+      }else{
+        $smt[$p]['Sks'] = $key->Sks;
+        $smt[$p]['Is_Transfer'] = $key->Is_Transfer;
+        $smt[$p]['Weight_Value'] = $key->Weight_Value;
+        $smt[$p]['is_Use'] = $key->is_Use;
+        $smt[$p]['Is_Required'] = $key->Is_Required;
+        $smt[$p]['Bnk_Value'] = $key->Bnk_Value;
+        $smt[$p]['Grade_Letter'] = $key->Grade_Letter;
+        $smt[$p]['Course_Code'] = $key->Course_Code;
+        $smt[$p]['Course_Name'] = $key->Course_Name;
+        $smt[$p]['Course_Name_Eng'] = $key->Course_Name_Eng;
+        $smt[$p]['weightvalue'] = $key->weightvalue;
+        $smt[$p]['Study_Level_Id'] = $key->Study_Level_Id;
+      }
+
+      $p++;
+    }
+
+    // dd($smt);
+    $nilai_d = 0;
+    foreach ($smt as $key)if($key['Grade_Letter'] == 'D'){
+      $nilai_d = $nilai_d+$key['Sks'];
+    }
+      $education_prog=DB::table('acd_transcript')
+      ->join('acd_student','acd_student.Student_Id','=','acd_transcript.Student_Id')
+      ->join('acd_course','acd_course.Course_Id','=','acd_transcript.Course_Id')
+      ->leftjoin('mstr_department','mstr_department.Department_Id','=','acd_course.Department_Id')
+      ->where('acd_student.Nim',$id)
+      ->groupBy('Education_Prog_Type_Id')
+      ->select('mstr_department.Education_Prog_Type_Id')
+     ->first();
+
+     $date = date('Y-m-d H:i:s');
+     $term_yearcount=DB::table('mstr_term_year')
+     ->where('Start_Date','<=',$date)
+     ->where('End_Date','>=',$date)
+     ->select('Start_Date','End_Date')
+     ->count();
+
+     if($term_yearcount == 0){
+       $term_year1 ="";
+     }else{
+       $term_year1=DB::table('mstr_term_year')
+       ->where('Start_Date','<=',$date)
+       ->where('End_Date','>=',$date)
+       ->select('Term_Year_Id')
+       ->first();
+       $term_year1=$term_year1->Term_Year_Id;
+     }
+
+     $dosen = DB::table('emp_employee')->join('acd_offered_course_lecturer', 'acd_offered_course_lecturer.Employee_Id' , '=', 'emp_employee.Employee_Id')
+     ->join('acd_offered_course', 'acd_offered_course.Offered_Course_id', '=', 'acd_offered_course_lecturer.Offered_Course_id')
+     ->where('acd_offered_course.Offered_Course_id', $id)
+     ->orderBy('acd_offered_course_lecturer.Order_Id' , 'asc')
+     ->get();
+
+     
+    //  dd($active);
+    if($active != null){
+      $atv = $active->Term_Year_Id;
+    }else{
+      $atv = 20191;
+    }
+     $dosens = DB::table('acd_functional_position_term_year')
+         ->join('emp_functional_position', 'emp_functional_position.Functional_Position_Id','=','acd_functional_position_term_year.Functional_Position_Id')
+         ->join('emp_employee', 'emp_employee.Employee_Id','=','acd_functional_position_term_year.Employee_Id')
+         ->leftjoin('mstr_faculty','mstr_faculty.Faculty_Id','=','acd_functional_position_term_year.Faculty_Id')
+         ->leftjoin('mstr_department','mstr_department.Department_Id','=','acd_functional_position_term_year.Department_Id')
+        //  ->where('acd_functional_position_term_year.Term_Year_Id', 20191)
+         ->where('acd_functional_position_term_year.Term_Year_Id', $atv)
+         ->orderBy('mstr_faculty.Faculty_Name', 'asc')
+         ->orderBy('mstr_department.Department_Name', 'asc')
+         ->orderBy('acd_functional_position_term_year.Functional_Position_Id', 'asc')
+         ->get();
+
+    // $keperluans = $reason = DB::table('mstr_transcript_reason')->where('Transcript_Reason_Id',$request->keperluan)->first();
+    $keperluan = $request->keperluan;
+
+    $complete_sks = 0;
+    if($student){
+      $curiculum = DB::table('acd_curriculum_entry_year')
+       ->where('Department_Id',$student->Department_Id)
+       ->where('Class_Prog_Id',$student->Class_Prog_Id)
+       ->where('Entry_Year_Id',$student->Entry_Year_Id)
+       ->first();
+       if($curiculum){
+         $complete_skss = DB::table('mstr_curriculum_applied')
+         ->where('Department_Id',$student->Department_Id)
+         ->where('Class_Prog_Id',$student->Class_Prog_Id)
+         ->where('Curriculum_Id',$curiculum->Curriculum_Id)
+         ->select('Sks_Completion')
+         ->first();
+         if($complete_skss != null){
+           $complete_sks = $complete_skss->Sks_Completion;
+         }else{
+           $complete_sks = 0;
+         }
+       }else{
+        $complete_sks = 0;
+       }
+    }
+    // $u =  DB::table('acd_temporary_transcript_reason')
+    //           ->insert([
+    //             'Student_Id' => $student->Student_Id,
+    //             'Transcript_Reason_Id' => 1,
+    //             'Description' => $request->keperluan,
+    //             'Created_Date'=>Date('Y-m-d'),
+    //             'Created_By'=>Auth::user()->email]);
+
+     View()->share(['complete_sks'=>$complete_sks,'keperluan'=>$keperluan,'nilai_d'=>$nilai_d,'faculty'=>$faculty,'dosen'=>$dosen,'dosens'=>$dosens,'query_'=>$query,'data'=> $data,'nim'=>$nim,'student'=>$student,'smt'=>$smt]);
+     if ($type == "transkripsementara") {
+       $pdf = PDF::loadView('cetak/export_transcriptsementara');
+       return $pdf->stream('Transkrip_sementara.pdf');
+     }
+     // return view('acd_course/index')->with('department', $department)->with('query',$data)->with('search',$search);
+
+   }
+
+
+  public function edit($id)
+  {
+      //
+  }
+
+  /**
+   * Update the specified resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function update(Request $request, $id)
+  {
+      //
+  }
+
+  /**
+   * Remove the specified resource from storage.
+   *
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function destroy($id)
+  {
+      //
+  }
+}

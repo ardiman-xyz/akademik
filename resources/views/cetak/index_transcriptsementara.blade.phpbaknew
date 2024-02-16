@@ -1,0 +1,182 @@
+@extends('layouts._layout')
+@section('pageTitle', 'Cetak Transkrip Sementara')
+@section('content')
+  <?php
+  $access = auth()->user()->akses();
+            $acc = $access;
+  ?>
+
+<style>
+@media (min-width:993px){.w3-modal-content{ width:35%; }.w3-hide-large{display:none!important}.w3-sidebar.w3-collapse{display:block!important}}
+</style>
+<section class="content">
+  <div class="container-fluid-title">
+    <div class="title-laporan">
+      <h3 class="text-white">Transkrip Sementara</h3>
+    </div>
+  </div>
+  <div class="container">
+    <div class="panel panel-default bootstrap-admin-no-table-panel">
+      <div class="panel-heading-green">
+        <div class="bootstrap-admin-box-title right text-white">
+          <b>Transkrip Sementara</b>
+        </div>
+      </div>
+      <br>
+        {!! Form::open(['url' => route('transcript_sementara.index') , 'method' => 'GET', 'name' => 'form', 'role' => 'form', 'style' => 'padding-top:5px;padding-left:15px;padding-right:15px;']) !!}
+          <div class="row text-green">
+          <label class="col-md-2">NIM Mahasiswa :</label>
+            <input type="text" class="form-control form-control-sm col-md-3" name="nim" id="nim" placeholder=" NIM" value="{{$nim}}">
+        </div>
+        <hr>
+
+        {!! Form::close() !!}
+        </div>
+        <div class="bootstrap-admin-panel-content bootstrap-admin-no-table-panel-content">
+          <div class="row text-green" style="padding-top:5px;padding-left:15px;padding-right:15px;">
+            <div class="col-sm-6">
+              @if($student != "")
+                <div >
+                  <label for="" class="col-sm-5">Nama Mahasiswa</label>
+                  <label for="" class="col-sm-5">:
+                    @if($student != "")
+                      {{ $student->Full_Name }}
+                    @endif
+                  </label>
+                </div>
+
+                <div>
+                  <label for="" class="col-sm-5">Cetak Transkrip Sementara</label>
+                  <?php
+                  foreach ($jmldata as $jmldat){
+                    ?>
+                    @if(in_array('transcript_sementara-CanExport', $acc))
+                      @if($jmldat != 0)
+                        <label id="log_mhs" class="col-sm-5"><a href="#" class="btn btn-info btn-sm" style="margin:5px;" >Cetak <i class="fa fa-print"></i> </a></label>
+                      @else
+                        <button disabled class="btn btn-info btn-sm" target="_blank"><i class="fa fa-print"></i> Cetak </button>
+                      @endif
+                    @endif
+                  <?php
+                  }
+                    ?>
+                </div>
+                @endif
+            </div>
+          </div>
+          @if (count($errors) > 0)
+            @foreach ( $errors->all() as $error )
+              <p class="alert alert-danger">{{ $error }}</p>
+            @endforeach
+          @endif
+
+      <div class="table-responsive">
+        <table class="table table-striped table-font-sm">
+          <thead class="thead-default thead-green">
+            <tr>
+              <th>No.</th>
+                <th>Kode Matakuliah</th>
+                <th>Nama Matakuliah</th>
+                <th>Nilai Huruf</th>
+                <th>SKS</th>
+                <th>Bobot x Nilai</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $a = 0;
+            $b = 1;
+            foreach ($query as $data) {
+              ?>
+              <tr>
+                  <!-- <th></th> -->
+                  <td width="10%">{{ $b++ }}</td>
+                  <td width="10%">{{ $data['Course_Code'] }}</td>
+                  <td width="50%">{{ $data['Course_Name'] }}</td>
+                  <td width="10%">{{ $data['Grade_Letter'] }}</td>
+                  <td width="10%">{{$data['Sks']}}</td>
+                  <td width="10%">{{ $data['weightvalue'] }}</td>
+
+              </tr>
+
+              <?php
+              $a++;
+            }
+            ?>
+            <tr style="background-color: #d9d9d9; font-size:12px; font-weight:bold;">
+                <td colspan="3" ><center>JUMLAH</td>
+                  <td></td>
+                <td>{{$query_['jml_sks']}}</td>
+                <td>{{ $query_['jml_mutu'] }}</td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+        <div class="col-sm-6">
+          <div >
+            <label for="" class="col-sm-6">Bobot Nilai x Jumlah SKS Semester</label>
+            <label for="" class="col-sm-4">: {{ $query_['jml_mutu'] }}</label>
+          </div>
+            <div >
+              <label for="" class="col-sm-6">Jumlah SKS Semester</label>
+              <label for="" class="col-sm-4">: {{$query_['jml_sks']}}</label>
+            </div>
+            <div >
+              <label for="" class="col-sm-6">Index Prestasi Semester</label>
+              <label for="" class="col-sm-4">: {{ $query_['ipk'] }}</label>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div id="mahasiswa" class="w3-modal">
+      <div class="w3-modal-content w3-animate-zoom w3-card-4">
+      <header class="w3-container w3-teal"> 
+          <span onclick="location.reload()" 
+          class="w3-button w3-display-topright">&times;</span>
+          <h4>Cetak Transkrip Sementara</h4>
+      </header>
+      <div class="w3-container">
+      </br>
+      <!-- <form id="frm-upload" action="{{ route('course_curriculum.store_silabus') }}" method="POST" enctype="multipart/form-data"> -->
+          <div class="row text-green" style="padding-top:5px;padding-left:15px;padding-right:15px;">
+            <div  class="row col-md-10">
+              <label class="col-md-4">Keperluan</label>
+              <input type="text" class="form-control form-control-sm col-md-7" name="keperluan" id="keperluan" placeholder=" syarat ujian" >
+            </div>
+            <div  class="row col-md-10">
+              <label class="col-md-4"></label>  
+              <button onclick="cetak()" type="button" class="btn-success btn-sm form-control form-control-sm col-md-7"name="button"  >Cetak</button>    
+            </div>
+            <div  class="row col-md-10">
+              <label class="col-md-4"></label>
+              <!-- <button value="up" id="bnt-cancel" onclick="" type="submit" class="btn-danger btn-sm btn form-control form-control-sm col-md-7" style="width:80%; margin-top: 2%;">
+                  Batal
+                </button>       -->
+              </div>
+            <!-- </form> -->
+            </div>
+          </br>
+      </div>
+      </div>
+      <table id="eaea">
+      </table>
+  </div>
+
+<script type="text/javascript">
+$(document).on('click', '#log_mhs', function (e) {
+    document.getElementById("mahasiswa").style.display = "block";
+});
+function cetak() {
+  
+    window.open('<?php echo env('APP_URL')?>cetak/transcript_sementara/'+$('#nim').val()+'/export?type=transkripsementara&nim='+$('#nim').val()+'&keperluan='+$('#keperluan').val());
+    document.getElementById("mahasiswa").style.display = "none";
+    // $("#fom")[0].reset();
+}
+</script>
+@endsection()

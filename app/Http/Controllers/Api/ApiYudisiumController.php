@@ -1,0 +1,507 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use DB;
+use App\User;
+use Session;
+use Auth;
+
+class ApiYudisiumController extends Controller
+{
+    //all
+    public function getMasterBerkasYudisiumController(Request $request)
+    {
+        // dd(Auth::user());
+        try {
+            $data = DB::table('mstr_yudisium_document')
+            ->orderBy('mstr_yudisium_document.Yudisium_Document_Id', 'asc')
+            ->get();
+
+            $datas = [];
+            $i = 0;
+            foreach ($data as $key) {
+                $datas[$i]['No'] = $i+1;
+                $datas[$i]['Yudisium_Document_Id'] = $key->Yudisium_Document_Id;
+                $datas[$i]['Yudisium_Document_Name'] = $key->Yudisium_Document_Name;
+                $i++;
+            }
+            return response()->json([
+                "success" => true,
+                "data" => $datas,
+                "total" => count($datas),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => $e
+            ], 200);
+        }
+    }
+
+    //post
+    public function postMasterBerkasYudisiumController(Request $request)
+    {
+        // dd($request->all());
+        try {
+            if($request->data['Yudisium_Document_Id'] == null){
+                $insert = DB::table('mstr_yudisium_document')
+                ->insert([
+                    'Yudisium_Document_Name' => $request->data['Yudisium_Document_Name'],
+                    'Created_By' => Auth::user()->email,
+                    'Created_Date' => date('Y-m-d H:i:s')
+                ]);
+                return response()->json([
+                    "success" => true,
+                    "data" => 'Berhasil menambah data',
+                    "total" => 1,
+                ], 200);
+            }else{
+                $insert = DB::table('mstr_yudisium_document')
+                ->where('Yudisium_Document_Id',$request->data['Yudisium_Document_Id'])
+                ->update([
+                    'Yudisium_Document_Name' => $request->data['Yudisium_Document_Name'],
+                    'Modified_By' => Auth::user()->email,
+                    'Modified_Date' => date('Y-m-d H:i:s')
+                ]);
+                return response()->json([
+                    "success" => true,
+                    "data" => 'Berhasil mengubah data',
+                    "total" => 1,
+                ], 200);
+            }
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => 'Gagal menambah data',
+                "message" => $e
+            ], 200);
+        }
+    }
+
+    //delete
+    public function deleteMasterBerkasYudisiumController(Request $request)
+    {
+        try {
+            $insert = DB::table('mstr_yudisium_document')
+            ->where('Yudisium_Document_Id',$request->data)
+            ->delete();
+            return response()->json([
+                "success" => true,
+                "data" => 'Berhasil menghapus data',
+                "total" => 1,
+            ], 200);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => 'Gagal menghapus data/ Data masih digunakan',
+                "message" => $e
+            ], 200);
+        }
+    }
+
+    //berkas per prodi
+    public function getMasterBerkasProdiYudisiumController(Request $request)
+    {
+        // dd($request->all());
+        try {
+            $datas = DB::table('acd_yudisium_prerequisite')
+            ->join('mstr_yudisium_document','mstr_yudisium_document.Yudisium_Document_Id','=','acd_yudisium_prerequisite.Yudisium_Document_Id')
+            ->where('Department_Id',$request->Department_Id)
+            ->orderBy('acd_yudisium_prerequisite.Order_Id', 'asc')
+            ->get();
+            
+            $data=[];
+            $i=0;
+            foreach ($datas as $key) {
+                $data[$i]['No'] = $i+1;
+                $data[$i]['Yudisium_Prerequisite_Id'] = $key->Yudisium_Prerequisite_Id;
+                $data[$i]['Yudisium_Document_Id'] = $key->Yudisium_Document_Id;
+                $data[$i]['Yudisium_Document_Name'] = $key->Yudisium_Document_Name;
+                $data[$i]['Copies'] = $key->Copies;
+                $i++;
+            }
+            return response()->json([
+                "success" => true,
+                "data" => $data,
+                "total" => count($data),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => $e
+            ], 200);
+        }
+    }
+
+    public function getBerkasNotinYudisiumController(Request $request)
+    {
+        // dd($request->all());
+        try {
+            $in = DB::table('acd_yudisium_prerequisite')
+            ->where('Department_Id',$request->Department_Id)
+            ->select('Yudisium_Document_Id');
+
+            $data = DB::table('mstr_yudisium_document')
+            ->wherenotin('Yudisium_Document_Id',$in)
+            ->orderBy('mstr_yudisium_document.Yudisium_Document_Id', 'asc')
+            ->get();
+
+            $datas = [];
+            $i = 0;
+            foreach ($data as $key) {
+                $datas[$i]['No'] = $i+1;
+                $datas[$i]['Yudisium_Document_Id'] = $key->Yudisium_Document_Id;
+                $datas[$i]['Yudisium_Document_Name'] = $key->Yudisium_Document_Name;
+                $i++;
+            }
+            if($request->Yudisium_Document_Id != null){
+                $i_use = DB::table('mstr_yudisium_document')
+                ->where('Yudisium_Document_Id',$request->Yudisium_Document_Id)
+                ->first();
+                $datas[$i]['No'] = $i+1;
+                $datas[$i]['Yudisium_Document_Id'] = $i_use->Yudisium_Document_Id;
+                $datas[$i]['Yudisium_Document_Name'] = $i_use->Yudisium_Document_Name;
+            }else{
+            }
+            return response()->json([
+                "success" => true,
+                "data" => $datas,
+                "total" => count($datas),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => $e
+            ], 200);
+        }
+    }
+
+    //post
+    public function postMasterBerkasProdiYudisiumController(Request $request)
+    {
+        // dd($request->all());
+        // try {
+            if($request->data['Yudisium_Prerequisite_Id'] == null){
+                $i= 0;
+                foreach ($request->data['Yudisium_Document_Id'] as $key => $value) {
+                    $insert = DB::table('acd_yudisium_prerequisite')
+                    ->insert([
+                        'Yudisium_Document_Id' => $value,
+                        'Department_Id' => $request->data['Department_Id'],
+                        'Copies' => ($request->data['Copies'][$i] == 0 ? 1:$request->data['Copies'][$i]),
+                        'Order_Id' => $value,
+                        'Created_By' => Auth::user()->email,
+                        'Created_Date' => date('Y-m-d H:i:s')
+                    ]);
+                    $i++;
+                }
+                return response()->json([
+                    "success" => true,
+                    "data" => 'Berhasil menambah data',
+                    "total" => 1,
+                ], 200);
+            }else{
+                $insert = DB::table('acd_yudisium_prerequisite')
+                ->where('Yudisium_Prerequisite_Id',$request->data['Yudisium_Prerequisite_Id'])
+                ->update([
+                    'Yudisium_Document_Id' => $request->data['Yudisium_Document_Id'],
+                    'Copies' => $request->data['Copies'],
+                    'Modified_By' => Auth::user()->email,
+                    'Modified_Date' => date('Y-m-d H:i:s')
+                ]);
+                return response()->json([
+                    "success" => true,
+                    "data" => 'Berhasil mengubah data',
+                    "total" => 1,
+                ], 200);
+            }
+            
+        // } catch (\Exception $e) {
+        //     return response()->json([
+        //         "success" => false,
+        //         "data" => 'Gagal menambah data',
+        //         "message" => $e
+        //     ], 200);
+        // }
+    }
+
+    //delete
+    public function deleteMasterBerkasProdiYudisiumController(Request $request)
+    {
+        try {
+            $insert = DB::table('acd_yudisium_prerequisite')
+            ->where('Yudisium_Prerequisite_Id',$request->data)
+            ->delete();
+            return response()->json([
+                "success" => true,
+                "data" => 'Berhasil menghapus data',
+                "total" => 1,
+            ], 200);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => 'Gagal menghapus data/ Data masih digunakan',
+                "message" => $e
+            ], 200);
+        }
+    }
+
+    // get stundet yudisium
+    public function GetStudentYudisium(Request $request){
+        try {
+            $datas=DB::table('acd_yudisium')
+            ->join('acd_transcript','acd_transcript.Student_Id','=','acd_yudisium.Student_Id')
+            ->join('acd_student','acd_student.Student_Id','=','acd_yudisium.Student_Id')
+            ->leftjoin('mstr_graduate_predicate','mstr_graduate_predicate.Graduate_Predicate_Id','=','acd_yudisium.Graduate_Predicate_Id')
+            ->where('acd_student.Department_Id',$request->Department_Id)
+            ->where('acd_yudisium.Term_Year_Id','like','%'.$request->Term_Year_Id.'%')
+            ->select('acd_yudisium.*','acd_student.*','mstr_graduate_predicate.*')
+            // DB::raw('round((sum(acd_transcript.Sks*acd_transcript.Weight_Value))/(SUM(acd_transcript.Sks)),2) as ipk'))
+            // DB::raw('round((sum(acd_transcript.Sks*acd_transcript.Weight_Value))/(SUM(acd_transcript.Sks)),2) as ipk'))
+            ->groupBy('acd_yudisium.Student_Id')
+            ->orderby('acd_student.Nim','asc')
+            ->get();
+
+            return response()->json([
+                "success" => true,
+                "data" => $datas,
+                "total" => count($datas),
+            ], 200);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => $e
+            ], 200);
+        }
+    }
+
+    public function GetPredicate(Request $request){
+        try {
+            $datas=DB::table('mstr_graduate_predicate')->get();
+
+            return response()->json($datas, 200);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => $e
+            ], 200);
+        }
+    }
+
+    //berkas yudisium per mahasiswa
+    public function getMasterBerkasSiswaYudisiumController(Request $request)
+    {
+        try {
+            $data_berkass = DB::table('acd_yudisium_prerequisite')
+                    ->join('mstr_yudisium_document','mstr_yudisium_document.Yudisium_Document_Id','=','acd_yudisium_prerequisite.Yudisium_Document_Id')
+                    ->where('Department_Id',$request->Department_Id)
+                    ->orderBy('acd_yudisium_prerequisite.Order_Id', 'asc')
+                    ->get();
+            
+                $data=[];
+                $i=0;
+            foreach ($data_berkass as $data_berkas) {
+                $berkass = DB::table('acd_yudisium_student_document')
+                ->join('acd_yudisium_prerequisite','acd_yudisium_student_document.Yudisium_Prerequisite_Id','=','acd_yudisium_prerequisite.Yudisium_Prerequisite_Id')
+                ->join('mstr_yudisium_document','mstr_yudisium_document.Yudisium_Document_Id','=','acd_yudisium_prerequisite.Yudisium_Document_Id')
+                ->where([
+                    ['acd_yudisium_prerequisite.Department_Id',$request->Department_Id],
+                    ['acd_yudisium_student_document.Student_Id',$request->Student_Id],
+                    ['acd_yudisium_student_document.Yudisium_Prerequisite_Id',$data_berkas->Yudisium_Prerequisite_Id]
+                ])
+                ->orderBy('acd_yudisium_prerequisite.Order_Id', 'asc')
+                ->select(
+                    'acd_yudisium_prerequisite.Yudisium_Document_Id',
+                    'acd_yudisium_prerequisite.Copies',
+                    'mstr_yudisium_document.Yudisium_Document_Name',
+                    'acd_yudisium_student_document.Student_Id',
+                    'acd_yudisium_student_document.Yudisium_Student_Document_Id',
+                    'acd_yudisium_student_document.Yudisium_Prerequisite_Id',
+                    'acd_yudisium_student_document.File_Upload',
+                    'acd_yudisium_student_document.Is_Accepted',
+                    'acd_yudisium_student_document.Notes',
+                    'acd_yudisium_student_document.Created_By'
+                )
+                ->first();
+
+                if($berkass){
+                    $data[$i]['No'] = $i+1;
+                    $data[$i]['Yudisium_Student_Document_Id'] = $berkass->Yudisium_Student_Document_Id;
+                    $data[$i]['Yudisium_Prerequisite_Id'] = $berkass->Yudisium_Prerequisite_Id;
+                    $data[$i]['Student_Id'] = $berkass->Student_Id;
+                    $data[$i]['File_Upload'] = $berkass->File_Upload;
+                    $data[$i]['Is_Accepted'] = $berkass->Is_Accepted;
+                    $data[$i]['Notes'] = $berkass->Notes;
+                    $data[$i]['Created_By'] = $berkass->Created_By;
+                    
+                    $data[$i]['Yudisium_Document_Id'] = $data_berkas->Yudisium_Document_Id;
+                    $data[$i]['Yudisium_Document_Name'] = $data_berkas->Yudisium_Document_Name;
+                    $data[$i]['Copies'] = $data_berkas->Copies;
+                }else{
+                    $data[$i]['No'] = $i+1;
+                    $data[$i]['Yudisium_Student_Document_Id'] = null;
+                    $data[$i]['Yudisium_Prerequisite_Id'] = $data_berkas->Yudisium_Prerequisite_Id;
+                    $data[$i]['Student_Id'] = $request->Student_Id;
+                    $data[$i]['File_Upload'] = null;
+                    $data[$i]['Is_Accepted'] = null;
+                    $data[$i]['Notes'] = null;
+                    $data[$i]['Created_By'] = null;
+                    
+                    $data[$i]['Yudisium_Document_Id'] = $data_berkas->Yudisium_Document_Id;
+                    $data[$i]['Yudisium_Document_Name'] = $data_berkas->Yudisium_Document_Name;
+                    $data[$i]['Copies'] = $data_berkas->Copies;
+                }
+                $i++;
+            }
+
+            return response()->json([
+                "success" => true,
+                "data" => $data,
+                "total" => count($data),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => $e
+            ], 200);
+        }
+    }
+    public function postBerkasSiswaYudisiumController(Request $request)
+    {
+        try{
+            foreach ($request->data['models'] as $key) {
+                if($key['Yudisium_Student_Document_Id'] == null){
+                    $insert = DB::table('acd_yudisium_student_document')
+                    ->insert([
+                        'Student_Id' => $key['Student_Id'],
+                        'Yudisium_Prerequisite_Id' => $key['Yudisium_Prerequisite_Id'],
+                        'Is_Accepted' => ($key['Is_Accepted'] == 'true' ? true:false),
+                        'Notes' => $key['Notes'],
+                        'Created_By' => Auth::user()->email,
+                        'Created_Date' => date('Y-m-d H:i:s')
+                    ]);
+                }else{
+                    $insert = DB::table('acd_yudisium_student_document')
+                    ->where('Yudisium_Student_Document_Id',$key['Yudisium_Student_Document_Id'])
+                    ->update([
+                        'Student_Id' => $key['Student_Id'],
+                        'Yudisium_Prerequisite_Id' => $key['Yudisium_Prerequisite_Id'],
+                        'Is_Accepted' => ($key['Is_Accepted'] == 'true' ? true:false),
+                        'Notes' => $key['Notes'],
+                        'Modified_By' => Auth::user()->email,
+                        'Modified_Date' => date('Y-m-d H:i:s')
+                    ]);
+                }
+            }
+            return response()->json([
+                "success" => true,
+                "data" => 'Berhasil mengubah data',
+                "total" => 1,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => $e
+            ], 200);
+        }
+    }
+
+    //delete yudisium siswa
+    public function deleteSiswaYudisiumController(Request $request)
+    {
+        try {
+            // dd($request->all());
+            $insert = DB::table('acd_yudisium')
+            ->where('Yudisium_Id',$request->data)
+            ->delete();
+            return response()->json([
+                "success" => true,
+                "data" => 'Berhasil menghapus data',
+                "total" => 1,
+            ], 200);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => 'Gagal menghapus data/ Data masih digunakan',
+                "message" => $e
+            ], 200);
+        }
+    }
+    
+    public function postDataSiswaYudisiumController(Request $request)
+    {
+        // dd($request->all());
+        try{
+            $err['nim'] = '';
+            $s = 0;
+            foreach ($request->data['models'] as $key) {
+                $duplicate=DB::table('acd_yudisium')
+                    ->where([['National_Certificate_Number', $key['National_Certificate_Number']],['National_Certificate_Number','!=',null],['Student_Id','!=',$key['Student_Id']]])
+                    ->orwhere([['Transcript_Num', $key['Transcript_Num']],['Transcript_Num','!=',null],['Student_Id','!=',$key['Student_Id']]])
+                    ->orwhere([['Skpi_Number', $key['Skpi_Number']],['Skpi_Number','!=',null],['Student_Id','!=',$key['Student_Id']]])
+                    ->first();
+                if($duplicate){
+                    $student = DB::table('acd_student')->where('Student_Id',$key['Student_Id'])->first();
+                    $err['nim'] = $err['nim'].'; '.$student->Nim;
+                    continue;
+                }else{
+                    $insert = DB::table('acd_yudisium')
+                    ->where('Yudisium_Id',$key['Yudisium_Id'])
+                    ->update([
+                        'Term_Year_Id' => $request->data['Term_Year_Id'],
+                        'Graduate_Predicate_Id' => $key['Graduate_Predicate_Id'],
+                        'National_Certificate_Number' => $key['National_Certificate_Number'],
+                        'Transcript_Num' => $key['Transcript_Num'],
+                        'Skpi_Number' => $key['Skpi_Number'],
+                        'Yudisium_Date' => $key['Yudisium_Date'],
+                        'Graduate_Date' => $key['Graduate_Date'],
+                        'Graduate_Predicate_Id' => $key['Graduate_Predicate_Id'],
+                        'Transcript_Date' => $key['Transcript_Date'],
+                        'Modified_By' => Auth::user()->email,
+                        'Modified_Date' => date('Y-m-d H:i:s')
+                    ]);
+
+                    if($key['Graduate_Date'] != null && $key['National_Certificate_Number'] != null){
+                        $update = DB::table('acd_student')
+                        ->where('Student_Id',$key['Student_Id'])
+                        // ->first();
+                        // dd($update);
+                        ->update([
+                            'Status_Id' => 8
+                        ]);
+                    }
+                }
+                $s++;
+            }
+            if($err['nim'] != ''){
+                return response()->json([
+                    "success" => true,
+                    "warning" => true,
+                    "data" => 'Sebagian data berhasil dirubah, Data Duplikat NIM '.$err['nim'].' berhasil di kembalikan',
+                    "total" => 1,
+                ], 200);
+            }else{
+                return response()->json([
+                    "success" => true,
+                    "warning" => false,
+                    "data" => 'Berhasil mengubah data',
+                    "total" => 1,
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "data" => $e
+            ], 200);
+        }
+    }
+}

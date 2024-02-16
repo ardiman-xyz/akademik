@@ -1,0 +1,74 @@
+.k-grid-toolbar:first-child,.k-grouping-header+.k-grid-toolbar{
+    border-width:0 0 0px;
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-bottom: 10px;
+    padding-right: 0px;
+}
+
+.k-grid{
+  border: 0px;
+}
+
+.k-grid th.k-header,
+.k-grid-header
+{
+  background:#1a3b7f;;
+}
+
+.k-grid th.k-header,
+.k-grid th.k-header .k-link
+{
+    color:white;
+    text-align:center;
+    font-size: 12px;
+}
+
+.k-grid td {
+  font-size: 14px;
+  color:black;
+}
+
+div.a {
+  height: 15px;
+}
+
+.tambah {
+  background:#1a7a00;
+  color:white;
+  font-style:italic;
+}
+
+.search {
+  background:#007bff;
+  color:white;
+  font-style:italic;
+}
+
+.k-grid-edit
+{
+  background-color: #1a3b7f;
+  color:white;
+}
+
+.k-grid-customDelete
+{
+  background-color: #dc3545;
+  color:white;
+}
+
+.k-grid .k-state-selected  {
+  background-color: #ffffff !important;
+  color: #000000;
+}
+ 
+.k-grid .k-alt.k-state-selected {
+  background-color: #f1f1f1 !important;
+  color: #000000;
+}
+
+
+.k-grid td.k-state-selected:hover, .k-grid tr:hover {
+  color: white !important;
+  background-color: #1a3b7f !important;
+}

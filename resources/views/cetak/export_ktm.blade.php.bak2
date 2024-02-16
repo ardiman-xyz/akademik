@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <style type="text/css">
+  @page :first {   size: 8.6cm 5.4cm;margin: 0cm 0px 0px 0cm;}
+  @page {  size: 8.6cm 5.4cm;margin: 0cm 0px 0px 0cm; }
+  .page_break { page-break-after: always; }
+  /* #header { position: fixed; left: 0px; top: -110px; right: 0px; height: 0px; text-align: center; } */
+  /* #footer { position: fixed; left: 0px; bottom: -10px; right: 0px; height: 10px; } */
+
+  /* #example-table {
+  background-image:url('{{ asset('img/ktm.png') }}');
+  background-size: 300px 100px; */
+  /* image courtesy of subtlepatterns.com */
+  /* } */
+  /* .images{
+  background-image: url({{ url('img/ktm.jpg') }});
+  } */
+
+  /* <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css"> */
+
+  @font-face {
+      font-family: 'Ebrima';
+      src: url("{{ asset('fonts/ebrima.ttf') }}");
+      /* src: url('../fonts/ebrima.ttf'); */
+  }
+
+  @font-face {
+      font-family: 'Edwardian';
+      src: url("{{ asset('fonts/ITCEDSCR.TTF') }}");
+      /* src: url('../fonts/ITCEDSCR.TTF'); */
+  }
+
+  @font-face {
+     font-family: 'frutiger';
+    font-style: normal;
+    src: url("{{ url('fonts/FrutigerLTStd-Roman.otf')}}");
+    /* src: url("{{ asset('fonts/FrutigerLTStd-Roman.otf') }}"); */
+  }
+
+  @font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: url(http://themes.googleusercontent.com/static/fonts/opensans/v8/cJZKeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Firefly';
+  font-style: normal;
+  font-weight: normal;
+  src: url(http://example.com/fonts/firefly.ttf) format('truetype');
+}
+
+
+  .bg{
+    margin-top: 0px;
+    margin-left: 0px;
+  }
+  .div1 {
+    position:absolute;
+    top:0px;
+    right:0px;
+    bottom:0px;
+    left:0px;
+    background-image: url("{{ url('img/ktm.png')}}");
+    background-size:100%;
+  }
+
+  .div1  .name{
+    /* font-family: 'Open Sans'; */
+    font-family: firefly, DejaVu Sans, sans-serif;
+    /* font-family: 'Nunito', sans-serif; */
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    font-size: 11.198pt;
+    margin-top: 62px;
+    margin-left: 90px;
+    color: black;
+    width: 235px;
+  }
+  .div1  .nim{
+    font-family: 'Ebrima';
+    letter-spacing: -0.5px;
+    font-size: 10.957pt;
+    margin-top: -8px;
+    margin-left: 90px;
+  }
+  .div1  .dept{
+    font-family: 'Ebrima';
+    letter-spacing: -0.5px;
+    font-size: 10.957pt;
+    margin-top: -8px;
+    margin-left:  90px;
+  }
+  .div1  .dept2{
+    font-family: 'Ebrima';
+    letter-spacing: -0.5px;
+    font-size: 10.957pt;
+    margin-top: -8px;
+    margin-left:  90px;
+  }
+
+  .div1  .image{
+    margin-top: -32px;
+    margin-left: 10px;
+  }
+  .div1  .tgl_akhir{
+    font-family: firefly, DejaVu Sans, sans-serif;
+    letter-spacing: -0.3px;
+    margin-top: -35px;
+    margin-left:  11px;
+  }
+  .div1  .hitam{
+    margin-top: -46px;
+    margin-left: 256px;
+  }
+  .div1  .qrcodes{
+    margin-top: -118px;
+    margin-left: 261px;
+  }
+
+  .div1  .barcode{
+    margin-top: 0px;
+    margin-left:  0px;
+    height: 10px;
+    width: 10px !important;
+    font-size: 8pt !important;
+  }
+  .div1  .ketua{
+    margin-top: -7px;
+    margin-left:  599px;
+    font-size: 6pt;
+  }
+  .div1  .nm_ketua{
+      margin-top: 0px;
+      margin-left: 0px;
+      font-size: 6pt;
+      text-decoration: underline;
+    }
+  .div1  .nik{
+      margin-top: 0px;
+      margin-left: 0px;
+      font-size: 5pt;
+    }
+
+  
+
+  .div2 {
+    margin-top: 12px;
+    margin-left: 0px;
+  }
+
+.div2  .name{
+  /* font-family: 'Open Sans'; */
+  font-family: firefly, DejaVu Sans, sans-serif;
+  /* font-family: 'Nunito', sans-serif; */
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  font-size: 11.198pt;
+    margin-top: 0.8cm;
+    margin-left: 90px;
+    color: black;
+    width: 235px;
+  }
+  .div2  .nim{
+  font-family: 'Ebrima';
+  font-size: 10.957pt;
+  letter-spacing: -0.5px;
+    margin-top: -2px;
+    margin-left: 90px;
+  }
+.div2  .dept{
+  font-family: 'Ebrima';
+  letter-spacing: -0.5px;
+  font-size: 10.957pt;
+    margin-top: -6px;
+    margin-left:  90px;
+  }
+.div2  .dept2{
+  font-family: 'Ebrima';
+  font-size: 10.957pt;
+  letter-spacing: -0.5px;
+    margin-top: -6px;
+    margin-left:  90px;
+    width:180px;
+    /* line-height:0.75; */
+  }
+  .div2  .barcode{
+    margin-top: 0px;
+    margin-left:  0px;
+    height: 10px;
+    width: 10px !important;
+    font-size: 8pt !important;
+  }
+  .div2  .ketua{
+    margin-top: 0px;
+    margin-left:  0px;
+    font-size: 6pt;
+  }
+.div2  .tgl_akhir{
+  font-family: firefly, DejaVu Sans, sans-serif;
+  letter-spacing: -0.3px;
+  font-weight: bold;
+    margin-top: 30px;
+    margin-left: 0.3cm;
+  }
+
+.div2  .image{
+    margin-top: -3.18cm;
+    margin-left: 0.3cm;
+  }
+.div2  .qrcodes{
+    margin-top: -1.77cm;
+    margin-left: 6.93cm;
+  }
+.div2  .hitam{
+    margin-top: -1.9cm;
+    margin-left: 6.8cm;
+  }
+  
+  .div2  .namestrstr{
+  /* font-family: 'Open Sans'; */
+  font-family: firefly, DejaVu Sans, sans-serif;
+  /* font-family: 'Nunito', sans-serif; */
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  font-size: 9.5pt;
+    margin-top: 0.8cm;
+    margin-left: 90px;
+    color: black;
+    width: 200px;
+  }
+  .div2  .nimstr{
+  font-family: 'Ebrima';
+  font-size: 10.957pt;
+  letter-spacing: -0.5px;
+    margin-top: -2px;
+    margin-left: 90px;
+  }
+.div2  .deptstr{
+  font-family: 'Ebrima';
+  letter-spacing: -0.5px;
+  font-size: 10.957pt;
+    margin-top: -6px;
+    margin-left:  90px;
+  }
+.div2  .dept2str{
+  font-family: 'Ebrima';
+  font-size: 10.957pt;
+  letter-spacing: -0.5px;
+    margin-top: -6px;
+    margin-left:  90px;
+    width:180px;
+    /* line-height:0.75; */
+  }
+  .div2  .barcodestr{
+    margin-top: 0px;
+    margin-left:  0px;
+    height: 10px;
+    width: 10px !important;
+    font-size: 8pt !important;
+  }
+  .div2  .ketuastr{
+    margin-top: 0px;
+    margin-left:  0px;
+    font-size: 6pt;
+  }
+.div2  .tgl_akhirstr{
+  font-family: firefly, DejaVu Sans, sans-serif;
+  letter-spacing: -0.3px;
+  font-weight: bold;
+    margin-top: 14px;
+    margin-left: 0.25cm;
+  }
+
+.div2  .imagestr{
+    margin-top: -3.20cm;
+    margin-left: 0.3cm;
+  }
+.div2  .qrcodesstr{
+    margin-top: -1.76cm;
+    margin-left: 6.93cm;
+  }
+.div2  .hitamstr{
+    margin-top: -1.93cm;
+    margin-left: 6.8cm;
+  }
+
+.div2  .namestr{
+  /* font-family: 'Open Sans'; */
+  font-family: firefly, DejaVu Sans, sans-serif;
+  /* font-family: 'Nunito', sans-serif; */
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  font-size: 9.5pt;
+    margin-top: 0.8cm;
+    margin-left: 90px;
+    color: black;
+    width: 235px;
+  }
+
+
+.div2  .nameshort{
+  /* font-family: 'Open Sans'; */
+  font-family: firefly, DejaVu Sans, sans-serif;
+  /* font-family: 'Nunito', sans-serif; */
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  font-size: 11.198pt;
+    margin-top: 0.8cm;
+    margin-left: 90px;
+    color: black;
+    width: 235px;
+  }
+.div2  .namestrd{
+  /* font-family: 'Open Sans'; */
+  font-family: firefly, DejaVu Sans, sans-serif;
+  /* font-family: 'Nunito', sans-serif; */
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  font-size: 11.198pt;
+    margin-top: 0.8cm;
+    margin-left: 90px;
+    color: black;
+    width: 235px;
+  }
+.div2  .nameshortshort{
+  /* font-family: 'Open Sans'; */
+  font-family: firefly, DejaVu Sans, sans-serif;
+  /* font-family: 'Nunito', sans-serif; */
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  font-size: 9.5pt;
+    margin-top: 0.8cm;
+    margin-left: 90px;
+    color: black;
+    width: 235px;
+  }
+.div2  .nimshort{
+  font-family: 'Ebrima';
+  font-size: 10.957pt;
+  letter-spacing: -0.5px;
+    margin-top: -2px;
+    margin-left: 90px;
+  }
+.div2  .deptshort{
+  font-family: 'Ebrima';
+  letter-spacing: -0.5px;
+  font-size: 10.957pt;
+    margin-top: -6px;
+    margin-left:  90px;
+  }
+.div2  .dept2short{
+  font-family: 'Ebrima';
+  font-size: 9.557pt;
+  letter-spacing: -0.5px;
+    margin-top: -5px;
+    margin-left:  90px;
+    width:140px;
+    line-height:0.75;
+  }
+  .div2  .barcodeshort{
+    margin-top: 0px;
+    margin-left:  0px;
+    height: 10px;
+    width: 10px !important;
+    font-size: 8pt !important;
+  }
+  .div2  .ketuashort{
+    margin-top: 0px;
+    margin-left:  0px;
+    font-size: 6pt;
+  }
+.div2  .tgl_akhirshort{
+  font-family: firefly, DejaVu Sans, sans-serif;
+  letter-spacing: -0.3px;
+  font-weight: bold;
+    margin-top: 11px;
+    margin-left: 0.25cm;
+  }
+
+.div2  .imageshort{
+    margin-top: -2.3cm;
+    margin-left: 0.3cm;
+  }
+.div2  .qrcodesshort{
+    margin-top: -1.79cm;
+    margin-left: 6.93cm;
+  }
+.div2  .hitamshort{
+    margin-top: -1.94cm;
+    margin-left: 6.8cm;
+  }
+  
+.div2  .nimshortstrd{
+  font-family: 'Ebrima';
+  font-size: 10.957pt;
+  letter-spacing: -0.5px;
+    margin-top: -2px;
+    margin-left: 90px;
+  }
+.div2  .deptshortstrd{
+  font-family: 'Ebrima';
+  letter-spacing: -0.5px;
+  font-size: 10.957pt;
+    margin-top: -6px;
+    margin-left:  90px;
+  }
+.div2  .dept2shortstrd{
+  font-family: 'Ebrima';
+  font-size: 9.557pt;
+  letter-spacing: -0.5px;
+    margin-top: -5px;
+    margin-left:  90px;
+    width:140px;
+    line-height:0.75;
+  }
+  .div2  .barcodeshortstrd{
+    margin-top: 0px;
+    margin-left:  0px;
+    height: 10px;
+    width: 10px !important;
+    font-size: 8pt !important;
+  }
+  .div2  .ketuashortstrd{
+    margin-top: 0px;
+    margin-left:  0px;
+    font-size: 6pt;
+  }
+.div2  .tgl_akhirshortstrd{
+  font-family: firefly, DejaVu Sans, sans-serif;
+  letter-spacing: -0.3px;
+  font-weight: bold;
+    margin-top: 11px;
+    margin-left: 0.25cm;
+  }
+
+.div2  .imageshortstrd{
+    margin-top: -2.75cm;
+    margin-left: 0.3cm;
+  }
+.div2  .qrcodesshortstrd{
+    margin-top: -1.79cm;
+    margin-left: 6.93cm;
+  }
+.div2  .hitamshortstrd{
+    margin-top: -1.90cm;
+    margin-left: 6.8cm;
+  }
+
+.div2  .font_ebrima{
+  font-family: 'Ebrima' !important;
+  }
+  /*
+
+  .div1 .div2{
+    width: 340px;
+    height: 20px;
+    background-color: #081F2B;
+  }
+  .div1 .div3{
+    width: 340px;
+    height: 40px;
+    background-color: #000;
+  }
+  .div1 .div4{
+    width: 321px;
+    height: 150px;
+    border: #red;
+    background-color: white;
+    margin-left: 8px;
+  }
+  .div1 .p1{
+    color: #000;
+    font-size: 6pt;
+  } */
+</style>
+</head>
+<body>
+  <div>
+    <?php 
+      $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+      
+      function generate_string($input, $strength = 16) {
+          $input_length = strlen($input);
+          $random_string = '';
+          for($i = 0; $i < $strength; $i++) {
+              $random_character = $input[mt_rand(0, $input_length - 1)];
+              $random_string .= $random_character;
+          }
+      
+          return $random_string;
+      }
+    foreach ($data as $data) {
+      $get_code = generate_string($permitted_chars, 5);
+      $data_rf = $data->Nim.$get_code;
+      $data_rfid = hash("md2", $data_rf);
+      
+       if(is_file(public_path($data->Photo))){
+          // $srcPhoto = env('APP_URL').$data->Photo;
+          $srcPhoto = '/home/web/umkendari/www/simakad/public/foto_mhs/'.$data->Entry_Year_Id.'/'.$data->Nim.'.jpg';
+        }else{
+          if($data->Photo != null || $data->Photo != ''){
+            $srcPhoto = '/home/web/umkendari/www/penmaru/public/uploads/'.$data->Register_Number.'/photo3x4.jpg';
+          }else{
+            $srcPhoto = '/home/web/umkendari/www/simakad/public/img/noimage.png';
+          }
+       }
+      ?>
+
+      {{-- <div class="div1">
+        <div class="div2"></div>
+        <div class="div3"></div>
+        <div class="div4">
+          <ol>
+            <li class="p1">Kartu ini adalah Kartu Mahasiswa STTNAS Yogyakarta</li>
+            <li class="p1">Kartu ini berlaku selama yang bersangkutan tercatat sebagai mahasiswa aktif
+              STTNAS Yogyakarta</li>
+            </ol>
+        </div>
+      </div> --}}
+      @if($bg == 1)
+      <div class="bg">&nbsp;</div>
+      <div class="div2">
+      <?php 
+          $leng = strlen($data->Department_Name);
+          if($leng > 19){ 
+            $lengname = strlen($data->Full_Name);
+            if($lengname <23){ ?>
+              <div class="nameshort"><b>{{ $data->Full_Name }}</div>
+              <div class="nimshort"><b>{{ $data->Nim }}</div>
+              <div class="deptshort">{{ $data->Program_Name }}</div>
+              <div class="dept2short">{{ $data->Department_Name }}</div>
+              <div><img class="imageshort" src="{{$srcPhoto}}" width="75px" height="100px" ></div>
+              <div class="tgl_akhirshort" style="font-size:8px;">
+                <?php $date = strtotime($tgl_akhir);
+                $birth = date('d-m-Y', $date);
+                ?>
+                Berlaku s/d {{$birth}}</div>
+              <div><img width="62" height="72" class="hitamshort" src="{{ ('img/scanme.png') }}" alt=""></div>
+              <div><img width="52" height="52" class="qrcodesshort" src="data:image/png;base64, {{ base64_encode(QrCode::format('png')  
+                              ->size(250)->errorCorrection('H')
+                              
+                              ->generate($data_rfid)) 
+                              }} "></div>
+            <?php }elseif ($lengname >= 23 && $lengname < 40) { ?>
+              <div class="namestrd"><b>{{ $data->Full_Name }}</div>              
+              <div class="nimshortstrd"><b>{{ $data->Nim }}</div>
+              <div class="deptshortstrd">{{ $data->Program_Name }}</div>
+              <div class="dept2shortstrd">{{ $data->Department_Name }}</div>
+              <div><img class="imageshortstrd" src="{{$srcPhoto}}" width="75px" height="100px" ></div>
+              <div class="tgl_akhirshortstrd" style="font-size:8px;">
+                <?php $date = strtotime($tgl_akhir);
+                $birth = date('d-m-Y', $date);
+                ?>
+                Berlaku s/d {{$birth}}</div>
+              <div><img width="62" height="72" class="hitamshortstrd" src="{{ ('img/scanme.png') }}" alt=""></div>
+              <div><img width="52" height="52" class="qrcodesshortstrd" src="data:image/png;base64, {{ base64_encode(QrCode::format('png')  
+                              ->size(250)->errorCorrection('H')
+                              
+                              ->generate($data_rfid)) 
+                              }} "></div>
+            <?php } else{ ?>
+              <div class="nameshortshort"><b>{{ $data->Full_Name }}</div>
+            <?php }
+            ?>
+          <?php }else{ 
+            $lengname = strlen($data->Full_Name);
+            if($lengname <24){ ?>
+              <div class="name"><b>{{ $data->Full_Name }}</div>
+              <div class="nim"><b>{{ $data->Nim }}</div>
+              <div class="dept">{{ $data->Program_Name }}</div>
+              <div class="dept2">{{ $data->Department_Name }}</div>
+              <div class="tgl_akhir" style="font-size:8px;">
+                <?php $date = strtotime($tgl_akhir);
+                $birth = date('d-m-Y', $date);
+                ?>
+                Berlaku s/d {{ $birth }}</div>
+              <div><img class="image" src="{{$srcPhoto}}" width="75px" height="100px" ></div>
+              
+              <div><img width="62" height="72" class="hitam" src="{{ ('img/scanme.png') }}" alt=""></div>
+              <div><img width="52" height="52" class="qrcodes" src="data:image/png;base64, {{ base64_encode(QrCode::format('png')  
+                              ->size(250)->errorCorrection('H')
+                              
+                              ->generate($data_rfid))
+                              }} "></div>
+              
+            <?php }elseif ($lengname > 24 && $lengname < 40) { ?>
+              <div class="namestrstr"><b>{{ $data->Full_Name }}</div>              
+              <div class="nimstr"><b>{{ $data->Nim }}</div>
+              <div class="deptstr">{{ $data->Program_Name }}</div>
+              <div class="dept2str">{{ $data->Department_Name }}</div>
+              <div class="tgl_akhirstr" style="font-size:8px;">
+                <?php $date = strtotime($tgl_akhir);
+                $birth = date('d-m-Y', $date);
+                ?>
+                Berlaku s/d {{$birth}}</div>
+              <div><img class="imagestr" src="{{$srcPhoto}}" width="75px" height="100px" ></div>
+              <div><img width="62" height="72" class="hitamstr" src="{{ ('img/scanme.png') }}" alt=""></div>
+              <div><img width="52" height="52" class="qrcodesstr" src="data:image/png;base64, {{ base64_encode(QrCode::format('png')  
+                              ->size(250)->errorCorrection('H')
+                              
+                              ->generate($data_rfid)) 
+                              }} "></div>
+            <?php } else{ ?>
+              <div class="namestr"><b>{{ $data->Full_Name }}</div>
+              <div class="nim"><b>{{ $data->Nim }}</div>
+              <div class="dept">{{ $data->Program_Name }}</div>
+              <div class="dept2">{{ $data->Department_Name }}</div>
+              <div><img class="image" src="{{$srcPhoto}}" width="75px" height="100px" ></div>
+              <div class="tgl_akhir" style="font-size:8px;">
+                <?php $date = strtotime($tgl_akhir);
+                $birth = date('d-m-Y', $date);
+                ?>
+                Berlaku s/d {{$birth}}</div>
+              <div><img width="62" height="72" class="hitam" src="{{ ('img/scanme.png') }}" alt=""></div>
+              <div><img width="52" height="52" class="qrcodes" src="data:image/png;base64, {{ base64_encode(QrCode::format('png')  
+                              ->size(250)->errorCorrection('H')
+                              
+                              ->generate($data_rfid)) 
+                              }} "></div>
+            <?php }
+            ?>
+        </div>
+        <?php  }
+        ?>
+      </div>
+      <div class="page_break"></div>
+      @else
+      <!-- <img class="bg" src="{{ ('img/ktm.png') }}" style="width:18.169 cm;" alt=""> -->
+      <div class="div1">
+        <div class="name"><b>{{ $data->Full_Name }}</div>
+        <div class="nim">{{ $data->Nim }}</div>
+        <div class="dept">{{ $data->Program_Name }}</div>  
+        <div class="dept2">{{ $data->Department_Name }}</div>
+        <img class="image" src="{{$srcPhoto}}" width="75px" height="100px" >        
+        <div class="tgl_akhir" style="font-size:8px;">
+          <?php $date = strtotime($tgl_akhir);
+          $birth = date('d-m-Y', $date);?>
+          <b>Berlaku s/d {{$birth}}
+        </div>
+        <img width="62" height="72" class="hitam" src="{{ ('img/scanme.png') }}" alt="">
+        <img width="52" height="52" class="qrcodes" src="data:image/png;base64, {{ base64_encode(QrCode::format('png')  
+                         ->size(250)->errorCorrection('H')
+                         ->generate('http://akademik-umkendari.utc-umy.id/cek?get_data='.$data->Student_Id)) }} ">  
+      </div>
+  <div class="page_break"></div>
+  @endif
+    <?php
+  }
+  ?>
+</body>
+</html>

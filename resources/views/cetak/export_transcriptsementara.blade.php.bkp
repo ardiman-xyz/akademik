@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+@page {  size: 8.27in 13.99in; margin: 0px 50px 30px 50px;}
+#kiri
+{
+  -webkit-column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
+}
+.tulisan{
+  font-size: 12px;
+}
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 150;
+  width: 100%;
+  text-align: center;
+}
+</style>
+  <div>
+    <img src="{{ ('img/header.png') }}" style="width:100%" alt="">
+      </div>
+      <hr>
+  </div>
+</head>
+<?php
+function tanggal_indo($tanggal, $cetak_hari = false)
+{
+	$hari = array ( 1 =>    'Senin',
+				'Selasa',
+				'Rabu',
+				'Kamis',
+				'Jumat',
+				'Sabtu',
+				'Minggu'
+			);
+
+	$bulan = array (1 =>   'Januari',
+				'Februari',
+				'Maret',
+				'April',
+				'Mei',
+				'Juni',
+				'Juli',
+				'Agustus',
+				'September',
+				'Oktober',
+				'November',
+				'Desember'
+			);
+	$split 	  = explode('-', $tanggal);
+	$tgl_indo = $split[2] . ' ' . $bulan[ (int)$split[1] ] . ' ' . $split[0];
+
+	if ($cetak_hari) {
+		$num = date('N', strtotime($tanggal));
+		return $hari[$num] . ', ' . $tgl_indo;
+	}
+	return $tgl_indo;
+}
+?>
+<body>
+  <div id="header">
+    <center><div style="font-size:13px;"><b>SURAT KETERANGAN HASIL STUDI</b></div></center>
+    <table  style="width:100%; font-size:14px;">
+      <tr>
+        <td>Nama</td>
+        <td>: {{ $student->Full_Name }}</td>
+        <td>Program Studi</td>
+        <?php 
+          $low=strtolower($student->Department_Name); 
+          $uc = ucwords($low);
+        ?>
+        <td>: {{ $uc }}</td>
+      </tr>
+      <tr>
+        <td width="20%">Nomor Mahasiswa</td>
+        <td width="30%">: {{ $student->Nim }}</td>
+        <td>Jenjang</td>
+        <td>: {{ $student->Acronym }} ({{$student->Program_Name}})</td>
+      </tr>
+      <tr>
+        <td width="20%">Tgl Lahir</td>
+        <?php 
+          $date = strtotime($student->Birth_Date);
+          $da = Date('Y-m-d',$date);
+          $birth = tanggal_indo($da,false);
+        ?>
+        <td width="30%">: {{ $birth }}</td>
+        <td>Konsentrasi</td>
+        <td>:</td>
+      </tr>
+    </table>
+  </div>
+  <div id="content">
+  <div style="clear:both; position:relative;">
+  <div style="position:absolute; left:0pt; width:50%;">
+    @if($count['smt1'] != 0)
+    <table border="1px" style="border-collapse : collapse; width:100%; font-size:10px;">
+      <thead>
+        <tr>
+          <th colspan='5'><center>SEMESTER I</th>
+        </tr>
+        <tr>
+          <th style="width:4%;"><center>No.</th>
+          <th style="width:16%;"><center>Kode</th>
+          <th style="width:60%;"><center>Nama Matakuliah</th>
+          <th style="width:10%;"><center>SKS</th>
+          <th style="width:10%;"><center>N</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $a = "1";
+        $sks_1 = 0;
+        foreach ($data as $datas_1) if($datas_1->Study_Level_Id == 1){ 
+          $sks_1 = $sks_1 + $datas_1->Sks;
+          ?>
+            <tr>
+                <!-- <th></th> -->
+                <td><center>{{ $a }}</td>
+                <td>{{ $datas_1->Course_Code }}</td>
+                <td>{{ $datas_1->Course_Name }}</td>
+                <td><center>{{$datas_1->Sks}}</td>
+                <td><center>{{ $datas_1->Grade_Letter }}</td>
+            </tr>
+          <?php
+          $a++;
+        }
+        ?>
+        <tr>
+          <td colspan="3"><center></td>
+          <td><center><?php echo(number_format($sks_1,1)); ?></td>
+          <td><center></td>
+        </tr>
+      </tbody>
+    </table>
+    @endif
+    @if($count['smt2'] != 0)
+    <table border="1px" style="border-collapse : collapse; width:100%; font-size:10px;">
+      <thead>
+        <tr>
+          <th colspan='5'><center>SEMESTER II</th>
+        </tr>
+        <tr>
+          <th style="width:4%;"><center>No.</th>
+          <th style="width:16%;"><center>Kode</th>
+            <th style="width:60%;"><center>Nama Matakuliah</th>
+            <th style="width:10%;"><center>SKS</th>
+            <th style="width:10%;"><center>N</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $a = 1;
+        $sks_2 = 0;
+        foreach ($data as $datas_2) if($datas_2->Study_Level_Id == 2){
+          $sks_2 = $sks_2 + $datas_2->Sks;
+          ?>
+            <tr>
+                <!-- <th></th> -->
+                <td><center>{{ $a }}</td>
+                <td>{{ $datas_2->Course_Code }}</td>
+                <td>{{ $datas_2->Course_Name }}</td>
+                <td><center>{{$datas_2->Sks}}</td>
+                <td><center>{{ $datas_2->Grade_Letter }}</td>
+            </tr>
+          <?php
+          $a++;
+        }
+        ?>
+        <tr>
+          <td colspan="3"><center></td>
+          <td><center><?php echo(number_format($sks_2,1)); ?></td>
+          <td><center></td>
+        </tr>
+      </tbody>
+    </table></br>
+    @endif
+    @if($count['smt3'] != 0)
+    <table border="1px" style="border-collapse : collapse; width:100%; font-size:10px;">
+      <thead>
+        <tr>
+          <th colspan='5'><center>SEMESTER III</th>
+        </tr>
+        <tr>
+          <th style="width:4%;"><center>No.</th>
+          <th style="width:16%;"><center>Kode</th>
+            <th style="width:60%;"><center>Nama Matakuliah</th>
+            <th style="width:10%;"><center>SKS</th>
+            <th style="width:10%;"><center>N</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $a = "1";
+        $sks_3 = 0;
+        foreach ($data as $datas_3) if($datas_3->Study_Level_Id == 3){
+          $sks_3 = $sks_3 + $datas_3->Sks;
+          ?>
+            <tr>
+                <!-- <th></th> -->
+                <td><center>{{ $a }}</td>
+                <td>{{ $datas_3->Course_Code }}</td>
+                <td>{{ $datas_3->Course_Name }}</td>
+                <td><center>{{$datas_3->Sks}}</td>
+                <td><center>{{ $datas_3->Grade_Letter }}</td>
+            </tr>
+          <?php
+          $a++;
+        }
+        ?>
+        <tr>
+          <td colspan="3"><center></td>
+          <td><center><?php echo(number_format($sks_3,1)); ?></td>
+          <td><center></td>
+        </tr>
+      </tbody>
+    </table></br>
+    @endif
+    @if($count['smt4'] != 0)
+    <table border="1px" style="border-collapse : collapse; width:100%; font-size:10px;">
+      <thead>
+        <tr>
+          <th colspan='5'><center>SEMESTER IV</th>
+        </tr>
+        <tr>
+          <th style="width:4%;"><center>No.</th>
+          <th style="width:16%;"><center>Kode</th>
+            <th style="width:60%;"><center>Nama Matakuliah</th>
+            <th style="width:10%;"><center>SKS</th>
+            <th style="width:10%;"><center>N</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $a = "1";
+        $sks_4 = 0;
+        foreach ($data as $datas_4) if($datas_4->Study_Level_Id == 4){
+          $sks_4 = $sks_4 + $datas_4->Sks;
+          ?>
+            <tr>
+                <!-- <th></th> -->
+                <td><center>{{ $a }}</td>
+                <td>{{ $datas_4->Course_Code }}</td>
+                <td>{{ $datas_4->Course_Name }}</td>
+                <td><center>{{$datas_4->Sks}}</td>
+                <td><center>{{ $datas_4->Grade_Letter }}</td>
+            </tr>
+          <?php
+          $a++;
+        }
+        ?>
+        <tr>
+          <td colspan="3"><center></td>
+          <td><center><?php echo(number_format($sks_4,1)); ?></td>
+          <td><center></td>
+        </tr>
+      </tbody>
+    </table>
+    @endif
+    </div>
+    <div style="margin-left:52%;">
+    @if($count['smt5'] != 0)
+    <table border="1px" style="border-collapse : collapse; width:100%; font-size:10px;">
+      <thead>
+        <tr>
+          <th colspan='5'><center>SEMESTER V</th>
+        </tr>
+        <tr>
+          <th style="width:4%;"><center>No.</th>
+          <th style="width:16%;"><center>Kode</th>
+            <th style="width:60%;"><center>Nama Matakuliah</th>
+            <th style="width:10%;"><center>SKS</th>
+            <th style="width:10%;"><center>N</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $a = "1";
+        $sks_5 = 0;
+        foreach ($data as $datas_5) if($datas_5->Study_Level_Id == 5){
+          $sks_5 = $sks_5 + $datas_5->Sks;
+          ?>
+            <tr>
+                <!-- <th></th> -->
+                <td><center>{{ $a }}</td>
+                <td>{{ $datas_5->Course_Code }}</td>
+                <td>{{ $datas_5->Course_Name }}</td>
+                <td><center>{{$datas_5->Sks}}</td>
+                <td><center>{{ $datas_5->Grade_Letter }}</td>
+            </tr>
+          <?php
+          $a++;
+        }
+        ?>
+      </tbody>
+      <tr>
+          <td colspan="3"><center></td>
+          <td><center><?php echo(number_format($sks_5,1)); ?></td>
+          <td><center></td>
+        </tr>
+    </table>
+    @endif
+    @if($count['smt6'] != 0)
+    <table border="1px" style="border-collapse : collapse; width:100%; font-size:10px;">
+      <thead>
+        <tr>
+          <th colspan='5'><center>SEMESTER VI</th>
+        </tr>
+        <tr>
+          <th style="width:4%;"><center>No.</th>
+          <th style="width:16%;"><center>Kode</th>
+            <th style="width:60%;"><center>Nama Matakuliah</th>
+            <th style="width:10%;"><center>SKS</th>
+            <th style="width:10%;"><center>N</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $a = "1";
+        $sks_6 = 0;
+        foreach ($data as $datas_6) if($datas_6->Study_Level_Id == 6){
+          $sks_6 = $sks_6 + $datas_6->Sks;
+          ?>
+            <tr>
+                <!-- <th></th> -->
+                <td><center>{{ $a }}</td>
+                <td>{{ $datas_6->Course_Code }}</td>
+                <td>{{ $datas_6->Course_Name }}</td>
+                <td><center>{{$datas_6->Sks}}</td>
+                <td><center>{{ $datas_6->Grade_Letter }}</td>
+            </tr>
+          <?php
+          $a++;
+        }
+        ?>
+        <tr>
+          <td colspan="3"><center></td>
+          <td><center><?php echo(number_format($sks_6,1)); ?></td>
+          <td><center></td>
+        </tr>
+      </tbody>
+    </table>
+    @endif
+    @if($count['smt7'] != 0)
+    <table border="1px" style="border-collapse : collapse; width:100%; font-size:10px;">
+      <thead>
+        <tr>
+          <th colspan='5'><center>SEMESTER VII</th>
+        </tr>
+        <tr>
+          <th style="width:4%;"><center>No.</th>
+          <th style="width:16%;"><center>Kode</th>
+            <th style="width:60%;"><center>Nama Matakuliah</th>
+            <th style="width:10%;"><center>SKS</th>
+            <th style="width:10%;"><center>N</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $a = "1";
+        $sks_7 = 0;
+        foreach ($data as $datas_7) if($datas_7->Study_Level_Id == 7){
+          $sks_7 = $sks_7 + $datas_7->Sks;
+          ?>
+            <tr>
+                <!-- <th></th> -->
+                <td><center>{{ $a }}</td>
+                <td>{{ $datas_7->Course_Code }}</td>
+                <td>{{ $datas_7->Course_Name }}</td>
+                <td><center>{{$datas_7->Sks}}</td>
+                <td><center>{{ $datas_7->Grade_Letter }}</td>
+            </tr>
+          <?php
+          $a++;
+        }
+        ?>
+      </tbody>
+      <tr>
+          <td colspan="3"><center></td>
+          <td><center><?php echo(number_format($sks_7,1)); ?></td>
+          <td><center></td>
+        </tr>
+    </table>
+    @endif
+    @if($count['smt8'] != 0)
+    <table border="1px" style="border-collapse : collapse; width:100%; font-size:10px;">
+      <thead>
+        <tr>
+          <th colspan='5'><center>SEMESTER VIII</th>
+        </tr>
+        <tr>
+          <th style="width:4%;"><center>No.</th>
+          <th style="width:16%;"><center>Kode</th>
+            <th style="width:60%;"><center>Nama Matakuliah</th>
+            <th style="width:10%;"><center>SKS</th>
+            <th style="width:10%;"><center>N</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $a = "1";
+        $sks_8 = 0;
+        foreach ($data as $datas_8) if($datas_8->Study_Level_Id == 8){
+          $sks_8 = $sks_8 + $datas_8->Sks;
+          ?>
+            <tr>
+                <!-- <th></th> -->
+                <td><center>{{ $a }}</td>
+                <td>{{ $datas_8->Course_Code }}</td>
+                <td>{{ $datas_8->Course_Name }}</td>
+                <td><center>{{$datas_8->Sks}}</td>
+                <td><center>{{ $datas_8->Grade_Letter }}</td>
+            </tr>
+          <?php
+          $a++;
+        }
+        ?>
+        <tr>
+          <td colspan="3"><center></td>
+          <td><center><?php echo(number_format($sks_8,1)); ?></td>
+          <td><center></td>
+        </tr>
+      </tbody>
+    </table>
+    @endif
+    
+    <div class="tulisan">
+    &nbsp;
+    </br>
+    <center>SKS Ditempuh = {{$query_['jml_sks']}}</center>
+    <center>IPK = {{ $query_['ipk'] }}</center>
+    <center>% Nilai D = {{ $nilai_d }} %</center>
+    <center>Sisa SKS = <?php if($complete_sks == 0){echo 'Kurikulum Prodi belum di set';}else{echo($complete_sks - $query_['jml_sks']);} ?></center>
+    <center>Surat keterangan ini dipergunakan untuk <br><b>{{$keperluan}}</center>
+    </div>
+    </div>
+    </div>
+  </div>
+  <div class="footer">
+  <table style="width:100%;">
+      <tr>
+        <td style="width:45%;"></td>
+        <td style="width:10%;"></td>
+        <td style="width:45%;"><center>
+          <label for="" style="font-size:13px;">{{env('NAME_City')}},  <?php echo date('d-m-Y'); ?> </label><br>
+        </td>
+      </tr>
+      <tr>
+        <td><center>
+          <label for="" style="font-size:13px;">Menyetujui,</label><br>
+          <label for="" style="font-size:13px;">Dekan Fakultas {{$faculty->Faculty_Name}}</label><br>
+          <div style="height:70px;"></div>
+          <label for="" style="font-size:13px;"><?php foreach ($dosens as $dosen) if($dosen->Functional_Position_Code == 'D' && $dosen->Faculty_Name == $faculty->Faculty_Name) {
+            echo $dosen->First_Title.' '.$dosen->Name.' '.$dosen->Last_Title;
+          } ?></label><br>
+          <label for="" style="font-size:13px;"><?php foreach ($dosens as $dosen) if($dosen->Functional_Position_Code == 'D'  && $dosen->Faculty_Name == $faculty->Faculty_Name) {
+            echo 'NIK '.$dosen->Nik;
+          } ?></label><br>
+        </td>
+        <td></td>
+        <td><center>
+          <label for="" style="font-size:13px;">Mengetahui,</label><br>
+          <label for="" style="font-size:13px;">Kepala Bagian Akademik</label><br>
+          <div style="height:70px;"></div>          
+          <label for="" style="font-size:13px;"><?php foreach ($dosens as $dosen) if($dosen->Functional_Position_Code == 'KBA') {
+            echo $dosen->First_Title.' '.$dosen->Name.' '.$dosen->Last_Title;
+          } ?></label><br>
+          <label for="" style="font-size:13px;"><?php foreach ($dosens as $dosen) if($dosen->Functional_Position_Code == 'KBA') {
+            echo 'NIK '.$dosen->Nik;
+          } ?></label><br>
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Presensi Hadir Kuliah</title>
+    <style>
+      @page { size: A4; }
+    </style>
+  </head>
+  <body>
+    <style media="screen">
+      .fa-sum:bofore{
+        content: "\03a3";
+        font-family: sans-serif;
+      }
+    </style>
+
+    <div id="header">
+      <img src="{{public_path('/img/header.jpg')}}" style="width:100%" alt="">
+    </div>
+    <br>
+
+
+    <!-- <div style="width:100%; font-size:14px;">
+      <center>DAFTAR HADIR KULIAH</center>
+      <center>{{ $data->Year_Id }}/{{ $data->Year_Id+1 }} Semester {{strtoupper($data->Term_Name)}}</center>
+    </div>
+    <br> -->
+    <b>
+    <table  style="width:100%; font-size:12px;">
+      <tr>
+        <td style="width:25%;">Program Studi</td><td style="width:1%;">:</td>
+        <td style="width:75%;">{{ $data->Department_Name }}</td>
+      </tr>
+      <tr>
+        <td>Nama Matakuliah</td><td>:</td>
+        <td>( {{ $data->Course_Code }} ) {{ $data->Course_Name }}</td>
+      </tr>
+      <tr>
+        <td>Kelas</td><td>:</td>
+        <td>{{ $data->Class_Name }} - {{ $data->Class_Program_Name }}</td>
+      </tr>
+      <tr>
+        <td>Hari/Jam/Ruang</td><td>:</td>
+        <td>
+          @if($jadwal)
+          {{ $jdwl[0]['Day_Name'] }} / {{ $jdwl[0]['Jam'] }} / {{ $jdwl[0]['Room_Name'] }}
+          @endif
+        </td>
+      </tr>
+      <tr>
+        <td>Dosen</td><td>:</td>
+        <td>
+          @foreach($dosen as $da)
+          <?php $lnm = strtolower($da->Name); $ucnm = ucwords($lnm); ?>
+            {{ $da->First_Title }} {{ $ucnm }} {{ $da->Last_Title }} <br>
+          @endforeach
+        </td>
+      </tr>
+    </table>
+    </b>
+      <br>
+
+    <table border="1px" style="border-collapse : collapse; width:100%; font-size:13px;">
+      <tr>
+        <th style="width:4%;" rowspan="2"><center>No</th>
+        <th style="width:12%;" rowspan="2"><center>NIM</center></th>
+        <th style="width:25%;" rowspan="2"><center>NAMA MAHASISWA</center></th>
+        <th style="width:5%;" rowspan="2"><center>L/P</center></th>
+        <?php
+        $count = 0;
+        for ($i = $kolom; $i <= $kolom2; $i++) {
+          $count = $count+1;
+        ?>
+        <?php
+          }
+        ?>
+        <th style="width:46%;" colspan="{{$count}}"><center>PERTEMUAN KE-</center></th>
+      </tr>
+      <tr>        
+        <?php
+          for ($i = $kolom; $i <= $kolom2; $i++) {
+        ?>
+        <th><center>{{$i}}</th>
+        <?php
+          }
+        ?>
+      </tr>
+
+      <?php $no = 1;?> 
+      @foreach($new_data as $key)
+      <tr>
+        <td><center>{{$no}}</td>
+        <td>&nbsp;{{$key['Nim']}}</td>
+        <td>&nbsp;{{$key['Full_Name']}}</td>
+        <td><center>{{$key['Gender_Id']}}</td>
+        <?php
+          for ($i = $kolom; $i <= $kolom2; $i++) {
+        ?>
+        <td  style="height:25px;"></td>
+        <?php
+          }
+        ?>
+      </tr>
+      <?php $no++; ?>
+      @endforeach
+    </table>
+    <br>
+    <!-- <table style="width:100%;">
+      <tr>
+        <td style="width:55%;"></td>
+        <td style="width:45%;">
+          <label for="" style="font-size:13px;">{{env('NAME_City')}}, {{date('d-m-Y')}}</label><br>
+        </td>
+      </tr>
+      @foreach($dosen as $da)
+      <tr>
+        <td style="width:55%;"></td>
+        <td style="width:45%;">
+          <label for="" style="font-size:13px;">Dosen Matakuliah, </label><br>
+          <div style="height:70px;"></div>
+          <?php $lnm = strtolower($da->Name); $ucnm = ucwords($lnm); ?>
+            {{ $da->First_Title }} {{ $ucnm }} {{ $da->Last_Title }} <br>
+        </td>
+      </tr>
+      @endforeach
+    </table> -->
+    <br>
+    <table style="width:100%;">
+      <tr>
+      @foreach($dosen as $da)
+        <td style=""><center>
+          <label for="" style="font-size:13px;">Dosen Matakuliah, </label><br>
+          <div style="height:70px;"></div>
+          <?php $lnm = strtolower($da->Name); $ucnm = ucwords($lnm); ?>
+            {{ $da->First_Title }} {{ $ucnm }} {{ $da->Last_Title }} <br>
+            {{ $da->Nidn }} <br>
+        </td>
+      @endforeach
+      </tr>
+    </table>
+    <br>
+    <table style="width:100%;">
+      <tr>
+        <td style=""><center>
+          <label for="" style="font-size:13px;">Mengetahui, </label><br>
+          <label for="" style="font-size:13px;">Ketua Program Studi, </label><br>
+          <div style="height:70px;"></div>
+          @if (count($functional_names)>0)
+          {{$functional_names[0]->Full_Name}}
+          <br>
+          {{$functional_names[0]->Nidn}}            
+          @endif
+        </td>
+      </tr>
+    </table>
+
+    </table>
+  </body>
+</html>
